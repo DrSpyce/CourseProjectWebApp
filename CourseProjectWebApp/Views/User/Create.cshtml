@@ -1,0 +1,68 @@
+﻿@using CourseProjectWebApp.Models
+@model CourseProjectWebApp.Models.ViewModels.CollectionAdditionalStringsViewModel
+@*@model CourseProjectWebApp.Models.AdditionalStrings*@
+@{
+	ViewData["Title"] = "Create";
+}
+
+<h1 class="text-center">Create Collection</h1>
+<div class="row">
+	<form asp-action="Create" method="post">
+		<div asp-validation-summary="All" class="text-danger"></div>
+		<div class="row justify-content-center align-items-center">
+			<div class="col-lg-4 mt-2">
+				<h2 class="fs-6 text-center">Collection data</h2>
+				<div class="form-group mb-4">
+					<label asp-for="Coll.Title" class="control-label"></label>
+					<input asp-for="Coll.Title" class="form-control" />
+					<span asp-validation-for="Coll.Title" class="text-danger"></span>
+				</div>
+				<div class="form-group mb-4">
+					<label asp-for="Coll.Description" class="control-label"></label>
+					<input asp-for="Coll.Description" class="form-control" />
+					<span asp-validation-for="Coll.Description" class="text-danger"></span>
+				</div>
+				<div class="form-group mb-4">
+					<label asp-for="Coll.Topic" class="control-label"></label>
+					<select asp-for="Coll.Topic" class="form-control" asp-items="Html.GetEnumSelectList<Collection.Topics>()"></select>
+					<span asp-validation-for="Coll.Topic" class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-lg-8">
+				@for(var i = 0; i < 3; i++)
+				{
+					<h2 class="fs-6 text-center">Additional string @i</h2>
+					<div class="row g-3 justify-content-center mb-2">
+						<div class="col-auto">
+							<div class="form-group">
+								<label asp-for="AddStr[i].Name" class="control-label justify-content-center"></label>
+								<input asp-for="AddStr[i].Name" class="form-control">
+								<span asp-validation-for="AddStr[i].Name" class="text-danger"></span>
+							</div>
+						</div>
+						<div class="col-auto">
+							<div class="form-group">
+								<label asp-for="AddStr[i].TypeOfData" class="control-label">Type Of Data</label>
+								<select asp-for="AddStr[i].TypeOfData" class="form-control" asp-items="Html.GetEnumSelectList<AdditionalStrings.TypesOfData>()"></select>
+								<span asp-validation-for="AddStr[i].TypeOfData" class="text-danger"></span>
+							</div>
+						</div>
+					</div>
+				}
+				
+			</div>
+		</div>
+		<div class="row mt-1 justify-content-center">
+			<input type="submit" value="Create" class="btn btn-primary w-25" />
+		</div>
+	</form>
+</div>
+<div class="justify-content-center mt-1 row">
+	<a class="text-center" asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	}

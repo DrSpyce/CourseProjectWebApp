@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using CourseProjectWebApp.Areas.Identity.Data;
+using CourseProjectWebApp.Models;
 
 namespace Task4Web2.Areas.Identity.Pages.Account
 {

@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using CourseProjectWebApp.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
 using static CourseProjectWebApp.Authorization.ProjectConstans;
 using CourseProjectWebApp.Models;
+using CourseProjectWebApp.Data;
+using CourseProjectWebApp.Models.ViewModels;
 
 namespace CourseProjectWebApp.Controllers
 {
@@ -27,7 +28,7 @@ namespace CourseProjectWebApp.Controllers
         [TempData]
         public string Message { get; set; }
 
-        private List<UserWithRolesModel> UsersWithRoles;
+        private List<UserRolesViewModel> UsersWithRoles;
 
         private List<ApplicationUser> Users = new List<ApplicationUser>();
 
@@ -55,7 +56,7 @@ namespace CourseProjectWebApp.Controllers
         private async Task GetUsers()
         {
             UsersWithRoles = await _userManager.Users
-            .Select(u => new UserWithRolesModel { User = u, Roles = new List<string>() })
+            .Select(u => new UserRolesViewModel { User = u, Roles = new List<string>() })
             .ToListAsync();
         }
 

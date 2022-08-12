@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CourseProjectWebApp.Migrations
 {
     [DbContext(typeof(CourseProjectWebAppContext))]
-    [Migration("20220806153910_IndentityAdding")]
-    partial class IndentityAdding
+    [Migration("20220808185108_ColectionAdding")]
+    partial class ColectionAdding
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -43,6 +43,9 @@ namespace CourseProjectWebApp.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("LastLoginTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -66,8 +69,14 @@ namespace CourseProjectWebApp.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("RegistrationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -87,6 +96,59 @@ namespace CourseProjectWebApp.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("CourseProjectWebApp.Models.CollectionModel+AdditionalStrings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CollectionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TypeOfData")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CollectionId");
+
+                    b.ToTable("AdditionalStrings");
+                });
+
+            modelBuilder.Entity("CourseProjectWebApp.Models.CollectionModel+Collection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Topic")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Collection");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -226,6 +288,17 @@ namespace CourseProjectWebApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("CourseProjectWebApp.Models.CollectionModel+AdditionalStrings", b =>
+                {
+                    b.HasOne("CourseProjectWebApp.Models.CollectionModel+Collection", "Collection")
+                        .WithMany("AdditionalStrings")
+                        .HasForeignKey("CollectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Collection");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -275,6 +348,11 @@ namespace CourseProjectWebApp.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CourseProjectWebApp.Models.CollectionModel+Collection", b =>
+                {
+                    b.Navigation("AdditionalStrings");
                 });
 #pragma warning restore 612, 618
         }

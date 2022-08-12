@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using CourseProjectWebApp.Areas.Identity.Data;
 using static CourseProjectWebApp.Authorization.ProjectConstans;
+using CourseProjectWebApp.Models;
+using CourseProjectWebApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("CourseProjectWebAppContextConnection") ?? throw new InvalidOperationException("Connection string 'CourseProjectWebAppContextConnection' not found.");

@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using CourseProjectWebApp.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using static CourseProjectWebApp.Authorization.ProjectConstans;
 
-namespace CourseProjectWebApp.Areas.Identity.Data
+namespace CourseProjectWebApp.Data
 {
     public static class SeedData
     {

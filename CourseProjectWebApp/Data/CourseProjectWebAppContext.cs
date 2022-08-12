@@ -3,10 +3,16 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using CourseProjectWebApp.Models;
 
-namespace CourseProjectWebApp.Areas.Identity.Data;
+namespace CourseProjectWebApp.Data;
 
 public class CourseProjectWebAppContext : IdentityDbContext<ApplicationUser>
 {
+    public DbSet<ApplicationUser>? ApplicationUser { get; set; }
+
+    public DbSet<Collection> Collection { get; set; }
+
+    public DbSet<AdditionalStrings> AdditionalStrings { get; set; }
+
     public CourseProjectWebAppContext(DbContextOptions<CourseProjectWebAppContext> options)
         : base(options)
     {
@@ -19,6 +25,4 @@ public class CourseProjectWebAppContext : IdentityDbContext<ApplicationUser>
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
     }
-
-    public DbSet<CourseProjectWebApp.Areas.Identity.Data.ApplicationUser>? ApplicationUser { get; set; }
 }
