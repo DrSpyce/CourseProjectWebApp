@@ -1,0 +1,36 @@
+﻿@model List<CourseProjectWebApp.Models.Collection>
+
+@{
+	ViewData["Title"] = "Mine";
+}
+
+@if (ViewData["Message"] != null)
+{
+	<div class="alert alert-warning alert-dismissible fade show" role="alert">
+		@ViewData["Message"]
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+}
+
+@if (Model.Count == 0)
+{
+	<h1 class="fs-3">You don't have Collections rigth now.</h1>
+	<a asp-action="Create" class="">Start with creating new one</a>
+}
+else
+{
+	<h1 class="fs-4 mb-3 ms-3">Here is list of your Collections:</h1>
+	<div class="list-group">
+		@foreach (var item in Model)
+		{
+			<div> </div>
+			<a asp-action="Details" asp-route-id="@item.Id" class="list-group-item list-group-item-action" aria-current="true">
+				<div class="ms-2 me-auto">
+					<div class="fw-bold fs-3">@item.Title</div>
+					Topic: @item.Topic
+				</div>
+			</a>
+		}
+	</div>
+	<a asp-action="Create" class="btn btn-primary mt-3 ms-3">Create new Collection</a>
+}

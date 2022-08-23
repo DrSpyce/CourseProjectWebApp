@@ -1,0 +1,43 @@
+﻿@model CourseProjectWebApp.Models.Item
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div>
+    <h4 class="text-center">@Model.Title</h4>
+    <hr />
+    
+    <dl class="row">
+        
+        @foreach (var addStr in ViewBag.AdditionalStrings)
+        {
+            <dt class="col-sm-2">
+                @addStr.Name
+            </dt>
+            <dd class="col-sm-10">
+                @Model.ItemsAdditionalStrings.Where(i => i.AdditionalStringsId == addStr.Id).First().Data
+            </dd>
+
+        }
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Tags)
+        </dt>
+        <dd class="col-sm-10">
+            @foreach (var tag in Model.Tags)
+            {
+                <a href="" class="">@tag.Name</a>
+            }
+        </dd>
+        @*<dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CollectionId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CollectionId)
+        </dd>*@
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

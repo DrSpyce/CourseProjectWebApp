@@ -1,0 +1,61 @@
+﻿@using CourseProjectWebApp.Models
+@model CourseProjectWebApp.Models.ViewModels.CollectionAdditionalStringsViewModel
+
+@{
+	ViewData["Title"] = "Edit";
+}
+
+<h1 class="text-center">Edit</h1>
+<h4 class="text-center">Collection</h4>
+
+<form asp-action="Edit" asp-route-id="@Model.Coll.Id" method="post">
+	<div class="row d-flex justify-content-center">
+		<div class="col-md-4 ">
+			<div asp-validation-summary="All" class="text-danger"></div>
+			<input type="hidden" asp-for="Coll.Id" />
+			<input type="hidden" asp-for="Coll.ApplicationUserId" />
+			<div class="form-group">
+				<label asp-for="Coll.Title" class="control-label"></label>
+				<input asp-for="Coll.Title" class="form-control" />
+				<span asp-validation-for="Coll.Title" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label asp-for="Coll.Description" class="control-label"></label>
+				<input asp-for="Coll.Description" class="form-control" />
+				<span asp-validation-for="Coll.Description" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label asp-for="Coll.Topic" class="control-label"></label>
+				<select asp-for="Coll.Topic" class="form-control" asp-items="Html.GetEnumSelectList<Collection.Topics>()"></select>
+				<span asp-validation-for="Coll.Topic" class="text-danger"></span>
+			</div>
+		</div>
+	</div>
+	<div class="row mt-2">
+		<h4 class="text-center">Additional strings</h4>
+		@for(var i = 0; i < Model.AddStr.Count; i++)
+		{
+			<div class="col-md-4">
+				<input type="hidden" asp-for="@Model.AddStr[i].Id" />
+				<input type="hidden" asp-for="@Model.AddStr[i].TypeOfData" value="@Model.AddStr[i].TypeOfData" />
+				<div class="form-group">
+					<label asp-for="@Model.AddStr[i].Name" class="control-label"></label>
+					<input asp-for="@Model.AddStr[i].Name" class="form-control" />
+					<span asp-validation-for="@Model.AddStr[i].Name" class="text-danger"></span>
+				</div>
+			</div>
+		}
+	</div>
+	<div class="form-group d-flex justify-content-center mt-3">
+		<input type="submit" value="Save" class="btn btn-primary px-4" />
+	</div>
+</form>
+<div class="d-flex justify-content-center">
+	<a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	}

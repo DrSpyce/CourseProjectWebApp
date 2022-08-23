@@ -19,6 +19,9 @@ namespace CourseProjectWebApp.Models
         [BindNever]
         public Collection? Collection { get; set; }
 
+        [BindNever]
+        public List<ItemsAdditionalStrings> ItemsAdditionalStrings { get; set; } = new();
+
         public enum TypesOfData
         {
             integer,

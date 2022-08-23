@@ -2,7 +2,6 @@
 
 namespace CourseProjectWebApp.Models.ViewModels
 {
-    
     public class CollectionAdditionalStringsViewModel
     {
         public Collection Coll { get; set; }

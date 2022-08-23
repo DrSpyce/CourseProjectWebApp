@@ -4,6 +4,7 @@ using CourseProjectWebApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CourseProjectWebApp.Migrations
 {
     [DbContext(typeof(CourseProjectWebAppContext))]
-    partial class CourseProjectWebAppContextModelSnapshot : ModelSnapshot
+    [Migration("20220816205259_AddingItem")]
+    partial class AddingItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -199,42 +201,6 @@ namespace CourseProjectWebApp.Migrations
                     b.ToTable("ItemsAdditionalStrings");
                 });
 
-            modelBuilder.Entity("CourseProjectWebApp.Models.Tag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Tag");
-                });
-
-            modelBuilder.Entity("ItemTag", b =>
-                {
-                    b.Property<int>("ItemsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ItemsId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("ItemTag");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -416,21 +382,6 @@ namespace CourseProjectWebApp.Migrations
                     b.Navigation("AdditionalStrings");
 
                     b.Navigation("Item");
-                });
-
-            modelBuilder.Entity("ItemTag", b =>
-                {
-                    b.HasOne("CourseProjectWebApp.Models.Item", null)
-                        .WithMany()
-                        .HasForeignKey("ItemsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CourseProjectWebApp.Models.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

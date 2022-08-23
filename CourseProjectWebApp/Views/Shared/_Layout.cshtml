@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CourseProjectWebApp.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+    <link href="~/lib/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <header>
@@ -26,6 +28,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        @if(User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Collection" asp-action="Mine">User Collections</a>
+                            </li>
+                        }
                         @if (User.IsInRole(Constants.AdministratorRole))
                         {
                             <li class="nav-item">
@@ -51,6 +59,9 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+    <script src="~/lib/tagify/dist/index.js"></script>
+	<script src="~/lib/tagify/dist/tagify.polyfills.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

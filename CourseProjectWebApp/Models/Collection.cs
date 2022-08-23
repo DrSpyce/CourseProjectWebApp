@@ -25,6 +25,8 @@ namespace CourseProjectWebApp.Models
         [BindNever]
         public ApplicationUser? ApplicationUser { get; set; }
 
+        public List<Item> Items { get; set; } = new();
+
         public enum Topics
         {
             Books,

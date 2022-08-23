@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using static CourseProjectWebApp.Authorization.ProjectConstans;
 using CourseProjectWebApp.Models;
 using CourseProjectWebApp.Data;
+using CourseProjectWebApp.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("CourseProjectWebAppContextConnection") ?? throw new InvalidOperationException("Connection string 'CourseProjectWebAppContextConnection' not found.");
@@ -33,6 +34,12 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<IAuthorizationHandler,
+                      CollectionIsOwnerAuthorizationHandler>();
+
+builder.Services.AddSingleton<IAuthorizationHandler,
+                     CollectionAdministratorAuthorizationHandler>();
 
 var app = builder.Build();
 

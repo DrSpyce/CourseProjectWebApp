@@ -13,6 +13,12 @@ public class CourseProjectWebAppContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<AdditionalStrings> AdditionalStrings { get; set; }
 
+    public DbSet<Item> Item { get; set; }
+
+    public DbSet<ItemsAdditionalStrings> ItemsAdditionalStrings { get; set; }
+
+    public DbSet<Tag> Tag { get; set; }
+
     public CourseProjectWebAppContext(DbContextOptions<CourseProjectWebAppContext> options)
         : base(options)
     {
@@ -25,4 +31,5 @@ public class CourseProjectWebAppContext : IdentityDbContext<ApplicationUser>
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
     }
+
 }
