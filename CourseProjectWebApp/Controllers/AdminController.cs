@@ -17,7 +17,6 @@ namespace CourseProjectWebApp.Controllers
     [Authorize(Roles = Constants.AdministratorRole)]
     public class AdminController : Controller
     {
-        private readonly CourseProjectWebAppContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -36,9 +35,8 @@ namespace CourseProjectWebApp.Controllers
 
         private bool LogOut = false;
 
-        public AdminController(CourseProjectWebAppContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager)
+        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager)
         {
-            _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;

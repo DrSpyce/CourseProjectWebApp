@@ -5,6 +5,7 @@ using static CourseProjectWebApp.Authorization.ProjectConstans;
 using CourseProjectWebApp.Models;
 using CourseProjectWebApp.Data;
 using CourseProjectWebApp.Authorization;
+using CourseProjectWebApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("CourseProjectWebAppContextConnection") ?? throw new InvalidOperationException("Connection string 'CourseProjectWebAppContextConnection' not found.");
@@ -41,6 +42,8 @@ builder.Services.AddScoped<IAuthorizationHandler,
 builder.Services.AddSingleton<IAuthorizationHandler,
                      CollectionAdministratorAuthorizationHandler>();
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -66,6 +69,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthentication();;
+
+app.MapHub<CommentHub>("/comment");
 
 app.UseAuthorization();
 

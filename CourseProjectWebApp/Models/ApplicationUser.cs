@@ -10,10 +10,14 @@ namespace CourseProjectWebApp.Models;
 public class ApplicationUser : IdentityUser
 {
     public virtual DateTime? LastLoginTime { get; set; }
+
     public virtual DateTime? RegistrationDate { get; set; }
+
     public UserStatus Status { get; set; } = UserStatus.Active;
 
-    public List<Collection> Collections { get; set; } = new List<Collection>();
+    public List<Collection> Collections { get; set; } = new();
+
+    public List<Comment> Comments { get; set; } = new();
 
     public enum UserStatus
     {

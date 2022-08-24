@@ -19,6 +19,8 @@ public class CourseProjectWebAppContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Tag> Tag { get; set; }
 
+    public DbSet<Comment> Comments { get; set; }
+
     public CourseProjectWebAppContext(DbContextOptions<CourseProjectWebAppContext> options)
         : base(options)
     {

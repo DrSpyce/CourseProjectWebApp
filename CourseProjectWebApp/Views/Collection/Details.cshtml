@@ -47,7 +47,6 @@
 				</form>
 			}
 		</div>
-		<a href="@ViewBag.returnUrl" class="fs-5">Back</a>
 	</div>
 </div>
 <hr />
@@ -61,8 +60,11 @@
 }
 else
 {
-	<a asp-controller="Item" asp-action="Create" asp-route-id="@Model.Coll.Id" class="btn-primary btn">Create new Item</a>
-	<h2 class="fs-4 mt-2">Here is list of your Collections:</h2>
+	@if ((await AuthorizationService.AuthorizeAsync(User, Model.Coll, CollectionOperations.Create)).Succeeded)
+	{
+		<a asp-controller="Item" asp-action="Create" asp-route-id="@Model.Coll.Id" class="btn-primary btn">Create new Item</a>
+	}
+	<h2 class="fs-4 mt-2">Here is list of Items:</h2>
 	<div class="list-group">
 		<table class="table text-center">
 			<thead>

@@ -1,4 +1,9 @@
-﻿@model CourseProjectWebApp.Models.Item
+﻿@using CourseProjectWebApp.Models
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@model CourseProjectWebApp.Models.Item
 
 @{
     ViewData["Title"] = "Details";
@@ -7,9 +12,9 @@
 <div>
     <h4 class="text-center">@Model.Title</h4>
     <hr />
-    
+
     <dl class="row">
-        
+
         @foreach (var addStr in ViewBag.AdditionalStrings)
         {
             <dt class="col-sm-2">
@@ -29,15 +34,101 @@
                 <a href="" class="">@tag.Name</a>
             }
         </dd>
-        @*<dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CollectionId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CollectionId)
-        </dd>*@
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+<hr />
+
+@if(User.Identity.IsAuthenticated)
+{
+    <div class="row d-flex justify-content-center">
+        <div class="col-md-8 col-lg-10">
+            <div id="commentList">
+                @foreach (var comment in Model.Comments)
+                {
+                    <div class="card mb-4 cloneItem">
+                        <div class="card-body">
+                            <p class="commentText">@comment.Text</p>
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex flex-row align-items-center">
+                                    <p class="small mb-0 ms-2 commentUserName">User: @comment.ApplicationUser.UserName</p>
+                                </div>
+                                <div class="d-flex flex-row align-items-center">
+                                    <p class="small text-muted mb-0 commentDate">Date: @comment.Created</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="form-outline mb-4">
+                <div>
+                    <textarea class="form-control" id="commentText"></textarea>
+                </div>
+                <span class="text-danger" id="commentTextValidation"></span>
+                <input type="submit" value="Add Comment" class="btn btn-primary mt-2" id="submit" />
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+    <script>
+        var connection = new signalR.HubConnectionBuilder().withUrl("/comment").build();
+       
+        connection.on("Receive", function (data) {
+            console.log(data[1]);
+            fillTemplate(data[0], data[1], data[2]);
+        });
+
+        var group = "group" + @Model.Id;
+
+        connection.start().then(function () {
+            connection.invoke("AddToGroup", group);
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+        $('#commentText').on('input', function () {
+            $('#commentTextValidation').text("");
+        });
+
+        $('#submit').click(function (event) {
+            event.preventDefault();
+            var text = $('#commentText').val();
+            var url = '@Url.Action("CreateComment", "Ajax")';
+            var user = '@UserManager.GetUserName(User)';
+            if (text == '') {
+                $('#commentTextValidation').text("Comment can't be empty");
+            }
+            else {
+                $('#commentText').val('');
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: {
+                        itemId: @Model.Id,
+                        userName: user,
+                        text: text
+                    },
+                    success: function (msg) {
+                        console.log('success')
+                    },
+                    error: function (req, status, error) {
+                        console.log(msg);
+                    }
+                });
+            }
+        });
+
+        function fillTemplate(commentText, userName, date){
+            var clone = $(".cloneItem").first().clone();
+            clone.find('.commentText').text(commentText);
+            clone.find('.commentUserName').text("User: " + userName);
+            clone.find('.commentDate').text("Date: " + date);
+            $('#commentList').append(clone);
+        }
+    </script>
+}

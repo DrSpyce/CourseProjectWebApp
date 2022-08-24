@@ -13,5 +13,7 @@
         public List<ItemsAdditionalStrings> ItemsAdditionalStrings { get; set; } = new();
 
         public List<Tag> Tags { get; set; } = new();
+
+        public List<Comment> Comments { get; set; } = new();
     }
 }

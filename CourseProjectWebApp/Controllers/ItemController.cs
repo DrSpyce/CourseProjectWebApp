@@ -11,6 +11,8 @@ using CourseProjectWebApp.Models.ViewModels;
 using static CourseProjectWebApp.Authorization.ProjectConstans;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+using CourseProjectWebApp.Hubs;
 
 namespace CourseProjectWebApp.Controllers
 {
@@ -19,8 +21,9 @@ namespace CourseProjectWebApp.Controllers
         private readonly CourseProjectWebAppContext _context;
         private readonly IAuthorizationService _authorizationService;
         private List<Tag> Tags = new();
+        
 
-        public ItemController(CourseProjectWebAppContext context, IAuthorizationService AuthorizationService)
+        public ItemController(CourseProjectWebAppContext context, IAuthorizationService AuthorizationService, IHubContext<CommentHub> hubContext)
         {
             _context = context;
             _authorizationService = AuthorizationService;
@@ -40,10 +43,15 @@ namespace CourseProjectWebApp.Controllers
             var item = await _context.Item
                 .Include(i => i.ItemsAdditionalStrings)
                 .Include(i => i.Tags)
+                .Include(i => i.Comments)
                 .FirstOrDefaultAsync(m => m.Id == itemId);
             if (item == null || collection == null)
             {
                 return NotFound();
+            }
+            foreach(var comment in item.Comments)
+            {
+                comment.ApplicationUser = _context.ApplicationUser.FirstOrDefault(a => a.Id == comment.ApplicationUserId);
             }
             await SetAdditionalDataForCreate(id);
             return View(item);
@@ -253,5 +261,7 @@ namespace CourseProjectWebApp.Controllers
             var isAuthorized = await _authorizationService.AuthorizeAsync(User, coll, task);
             return isAuthorized.Succeeded;
         }
+
+        
     }
 }
