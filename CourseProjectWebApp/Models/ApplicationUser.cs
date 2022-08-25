@@ -19,6 +19,8 @@ public class ApplicationUser : IdentityUser
 
     public List<Comment> Comments { get; set; } = new();
 
+    public List<ItemUserLike> ItemUserLikes { get; set; } = new();
+
     public enum UserStatus
     {
         Active,

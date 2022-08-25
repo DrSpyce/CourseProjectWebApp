@@ -101,7 +101,7 @@ else
 								<a asp-controller="item" asp-action="Details" asp-route-id="@Model.Coll.Id" asp-route-itemId="@item.Id" class="btn btn-primary">Show</a>
 								@if ((await AuthorizationService.AuthorizeAsync(User, Model.Coll, CollectionOperations.Update)).Succeeded)
 								{
-									<a asp-controller="Item" asp-action="Edit" asp-route-id="@Model.Coll.Id" asp-route-itemId="@item.Id" class="btn btn-primary me-1">Edit</a>
+									<a asp-controller="Item" asp-action="Edit" asp-route-id="@Model.Coll.Id" asp-route-itemId="@item.Id" class="btn btn-primary ms-1 me-1">Edit</a>
 
 								}
 								@if ((await AuthorizationService.AuthorizeAsync(User, Model.Coll, CollectionOperations.Delete)).Succeeded)

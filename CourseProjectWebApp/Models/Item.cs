@@ -15,5 +15,7 @@
         public List<Tag> Tags { get; set; } = new();
 
         public List<Comment> Comments { get; set; } = new();
+
+        public List<ItemUserLike> ItemUserLikes { get; set; } = new();
     }
 }

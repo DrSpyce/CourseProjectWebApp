@@ -5,6 +5,13 @@
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/courseprojectwebappdbserver/databases/CourseProjectWebApp_db",
       "type": "mssql.azure",
       "connectionId": "ConnectionStrings:CourseProjectWebAppContextConnection"
+    },
+    "signalr1": {
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.SignalRService/SignalR/CourseProjectWebApp",
+      "type": "signalr.azure",
+      "connectionId": "Azure:SignalR:ConnectionString",
+      "dynamicId": null
     }
   }
 }

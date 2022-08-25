@@ -44,6 +44,7 @@ namespace CourseProjectWebApp.Controllers
                 .Include(i => i.ItemsAdditionalStrings)
                 .Include(i => i.Tags)
                 .Include(i => i.Comments)
+                .Include(i => i.ItemUserLikes)
                 .FirstOrDefaultAsync(m => m.Id == itemId);
             if (item == null || collection == null)
             {

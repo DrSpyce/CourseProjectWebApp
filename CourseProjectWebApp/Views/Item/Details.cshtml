@@ -36,7 +36,13 @@
         </dd>
     </dl>
 </div>
-
+<p>Likes: <span id="likesCount">@Model.ItemUserLikes.Count()</span></p>
+@if (User.Identity.IsAuthenticated)
+{
+    <button id="likeButton" class="btn-primary btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+      <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+    </svg> Like</button>
+}
 <hr />
 
 @if(User.Identity.IsAuthenticated)
@@ -44,6 +50,19 @@
     <div class="row d-flex justify-content-center">
         <div class="col-md-8 col-lg-10">
             <div id="commentList">
+                <div class="card mb-4 cloneItem visually-hidden">
+                    <div class="card-body">
+                        <p class="commentText"></p>
+                        <div class="d-flex justify-content-between">
+                            <div class="d-flex flex-row align-items-center">
+                                <p class="small mb-0 ms-2 commentUserName"></p>
+                            </div>
+                            <div class="d-flex flex-row align-items-center">
+                                <p class="small text-muted mb-0 commentDate"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 @foreach (var comment in Model.Comments)
                 {
                     <div class="card mb-4 cloneItem">
@@ -66,7 +85,7 @@
                     <textarea class="form-control" id="commentText"></textarea>
                 </div>
                 <span class="text-danger" id="commentTextValidation"></span>
-                <input type="submit" value="Add Comment" class="btn btn-primary mt-2" id="submit" />
+                <input type="submit" value="Add Comment" class="btn btn-primary mt-2 " id="submit" />
             </div>
         </div>
     </div>
@@ -77,11 +96,53 @@
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
     <script>
+        $('#likeButton').click(function (event) {
+            event.preventDefault();
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("SetLike","ajax")',
+                data: {
+                    itemId: @Model.Id,
+                    userName: '@UserManager.GetUserName(User)',
+                },
+                success: function (msg) {
+                    $('#likeButton').addClass('disabled');
+                    console.log(msg);
+                },
+                error: function (req, status, error) {
+                    console.log(error);
+                }
+            });
+        });
+
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("IsLiked","ajax")',
+            data: {
+                itemId: @Model.Id,
+                userName: '@UserManager.GetUserName(User)',
+            },
+            success: function (msg) {
+                if(msg == 'true'){
+                    $('#likeButton').addClass('disabled');
+                }
+                console.log(msg)
+            },
+            error: function (req, status, error) {
+                console.log(error);
+            }
+        });
+       
         var connection = new signalR.HubConnectionBuilder().withUrl("/comment").build();
        
         connection.on("Receive", function (data) {
-            console.log(data[1]);
             fillTemplate(data[0], data[1], data[2]);
+        });
+
+        connection.on("increment", function () {
+            var likes = $('#likesCount').text();
+            likes++;
+            $('#likesCount').text(likes);
         });
 
         var group = "group" + @Model.Id;
@@ -128,6 +189,7 @@
             clone.find('.commentText').text(commentText);
             clone.find('.commentUserName').text("User: " + userName);
             clone.find('.commentDate').text("Date: " + date);
+            clone.removeClass('visually-hidden');
             $('#commentList').append(clone);
         }
     </script>

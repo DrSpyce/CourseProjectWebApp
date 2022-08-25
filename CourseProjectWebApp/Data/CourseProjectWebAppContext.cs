@@ -21,6 +21,8 @@ public class CourseProjectWebAppContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Comment> Comments { get; set; }
 
+    public DbSet<ItemUserLike> ItemUserLike { get; set; }
+
     public CourseProjectWebAppContext(DbContextOptions<CourseProjectWebAppContext> options)
         : base(options)
     {

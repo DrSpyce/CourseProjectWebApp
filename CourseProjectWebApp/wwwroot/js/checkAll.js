@@ -1,4 +1,14 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+﻿window.onload = function () {
+    var f = document.getElementById('form1');
+    f.cb_all.onchange = function (e) {
+        var el = e ? e.target : window.event.srcElement;
+        var cb = el.form.getElementsByClassName('cb');
+        for (var i = 0; i < cb.length; i++) {
+            if (el.checked) {
+                cb[i].checked = true;
+            } else {
+                cb[i].checked = false;
+            }
+        }
+    }
+}

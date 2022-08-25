@@ -34,7 +34,7 @@ namespace CourseProjectWebApp.Controllers
             {
                 return NotFound();
             }
-            if(await FillAndCheck((int)itemId, userName))
+            if(!await FillAndCheck((int)itemId, userName))
             {
                 return NotFound();
             }
@@ -67,6 +67,64 @@ namespace CourseProjectWebApp.Controllers
             Convert.ToString(comment.Created);
             List<string> data = new() { comment.Text, userName, Convert.ToString(comment.Created) };
             await _hubContext.Clients.Group($"group{itemId}").SendAsync("Receive", data);
+        }
+
+        [HttpGet]
+        [Authorize]
+        [IgnoreAntiforgeryToken]
+        [Route("IsLiked")]
+        public async Task<IActionResult> IsLiked(int? itemId, string userName)
+        {
+            if (itemId == null || userName == null)
+            {
+                return NotFound();
+            }
+            if (!await FillAndCheck((int)itemId, userName))
+            {
+                return NotFound();
+            }
+            var like = await _context.ItemUserLike.Where(l => l.itemId == itemId).Where(l=> l.ApplicationUserId == AppUser.Id).FirstOrDefaultAsync();
+            if(like == null)
+            {
+                return Ok("false");
+            }
+            return Ok("true");
+        }
+
+        [HttpGet]
+        [Authorize]
+        [IgnoreAntiforgeryToken]
+        [Route("SetLike")]
+        public async Task<IActionResult> SetLike(int? itemId, string userName)
+        {
+            if (itemId == null || userName == null)
+            {
+                return NotFound();
+            }
+            if (!await FillAndCheck((int)itemId, userName))
+            {
+                return NotFound();
+            }
+            var like = await _context.ItemUserLike.Where(l => l.itemId == itemId).Where(l => l.ApplicationUserId == AppUser.Id).FirstOrDefaultAsync();
+            if (like == null)
+            {
+                await CreateLike((int)itemId);
+                return Ok("liked");
+            }
+            return Ok("AlreadyLiked");
+        }
+
+        private async Task CreateLike(int itemId)
+        {
+            var like = new ItemUserLike() { ApplicationUserId = AppUser.Id ,itemId = itemId };
+            await _context.ItemUserLike.AddAsync(like);
+            await _context.SaveChangesAsync();
+            await IncrementLikesCounter(itemId);
+        }
+
+        private async Task IncrementLikesCounter(int itemId)
+        {
+            await _hubContext.Clients.Group($"group{itemId}").SendAsync("increment");
         }
     }
 }
