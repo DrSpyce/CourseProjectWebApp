@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using static System.Net.Mime.MediaTypeNames;
+using Korzh.EasyQuery.Linq;
+using System.Text.Json;
 
 namespace CourseProjectWebApp.Controllers
 {
@@ -125,6 +127,17 @@ namespace CourseProjectWebApp.Controllers
         private async Task IncrementLikesCounter(int itemId)
         {
             await _hubContext.Clients.Group($"group{itemId}").SendAsync("increment");
+        }
+
+        [HttpGet]
+        [IgnoreAntiforgeryToken]
+        [Route("SearchItem")]
+        public async Task<JsonResult> SearchItem(string str)
+        {
+            FullTextSearchOptions opts = new();
+            opts.IsDescendingOrder = false;
+            var res = _context.Collection.FullTextSearchQuery(str, opts);
+            return new JsonResult(res);
         }
     }
 }
