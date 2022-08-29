@@ -6,6 +6,8 @@ using CourseProjectWebApp.Models;
 using CourseProjectWebApp.Data;
 using CourseProjectWebApp.Authorization;
 using CourseProjectWebApp.Hubs;
+using CourseProjectWebApp.Interfaces;
+using CourseProjectWebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("CourseProjectWebAppContextConnection") ?? throw new InvalidOperationException("Connection string 'CourseProjectWebAppContextConnection' not found.");
@@ -43,6 +45,9 @@ builder.Services.AddSingleton<IAuthorizationHandler,
                      CollectionAdministratorAuthorizationHandler>();
 
 builder.Services.AddSignalR();
+
+builder.Services.AddScoped<IAjaxService, AjaxService>();
+
 
 var app = builder.Build();
 

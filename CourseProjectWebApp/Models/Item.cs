@@ -1,4 +1,7 @@
-﻿namespace CourseProjectWebApp.Models
+﻿using Microsoft.Extensions.Hosting;
+using System.Xml.Linq;
+
+namespace CourseProjectWebApp.Models
 {
     public class Item
     {

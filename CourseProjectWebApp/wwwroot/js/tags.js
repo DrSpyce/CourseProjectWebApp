@@ -21,10 +21,8 @@ function addAlert() {
     if (!$('#tagAlert').length) {
         if ($('#model').length) {
             $('#model').remove();
-            console.log(1234);
             return;
         }
-        console.log(1111);
         $('<span>').attr({
             class: "text-danger field-validation-error",
             id: "tagAlert"
