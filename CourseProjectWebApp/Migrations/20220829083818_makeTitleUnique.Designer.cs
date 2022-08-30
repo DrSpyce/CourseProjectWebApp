@@ -4,6 +4,7 @@ using CourseProjectWebApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CourseProjectWebApp.Migrations
 {
     [DbContext(typeof(CourseProjectWebAppContext))]
-    partial class CourseProjectWebAppContextModelSnapshot : ModelSnapshot
+    [Migration("20220829083818_makeTitleUnique")]
+    partial class makeTitleUnique
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,9 +34,6 @@ namespace CourseProjectWebApp.Migrations
 
                     b.Property<int?>("CollectionId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("Display")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -141,8 +140,7 @@ namespace CourseProjectWebApp.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Topic")
                         .HasColumnType("int");

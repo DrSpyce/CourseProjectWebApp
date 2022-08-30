@@ -64,6 +64,21 @@ namespace CourseProjectWebApp.Services
             return false;
         }
 
+        public async Task<bool> UnsetLike(int? itemId, string userName)
+        {
+            if (await FillAndCheck(itemId, userName))
+            {
+                var like = await _context.ItemUserLike.Where(l => l.itemId == itemId).Where(l => l.ApplicationUserId == AppUser!.Id).FirstOrDefaultAsync();
+                if (like != null)
+                {
+                    await DeleteLike(like);
+                    await DecrementLikesCounter((int) itemId);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public JsonResult SearchItem(string str, int numberOfResults = 5)
         {
             var result = SearchItems(str, numberOfResults);
@@ -72,6 +87,11 @@ namespace CourseProjectWebApp.Services
                 SearchCollections(str, numberOfResults, result);
             }
             return new JsonResult(result);
+        }
+
+        public async Task<List<string>> GetTag(string term)
+        {
+            return await _context.Tag.Where(t => t.Name.Contains(term)).Select(t => t.Name).ToListAsync();
         }
 
         private async Task<bool> FillAndCheck(int? itemId, string? userName)
@@ -115,9 +135,20 @@ namespace CourseProjectWebApp.Services
             await IncrementLikesCounter(itemId);
         }
 
+        private async Task DeleteLike(ItemUserLike like)
+        {
+            _context.ItemUserLike.Remove(like);
+            await _context.SaveChangesAsync();
+        }
+
         private async Task IncrementLikesCounter(int itemId)
         {
             await _hubContext.Clients.Group($"group{itemId}").SendAsync("increment");
+        }
+
+        private async Task DecrementLikesCounter(int itemId)
+        {
+            await _hubContext.Clients.Group($"group{itemId}").SendAsync("decrement");
         }
 
         private List<SearchResult> SearchItems(string str, int numberOfResults)

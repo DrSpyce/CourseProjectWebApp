@@ -41,10 +41,29 @@
 			}
 			@if ((await AuthorizationService.AuthorizeAsync(User, Model.Coll, CollectionOperations.Delete)).Succeeded)
 			{
-				@*make alert for deleting collection*@
-				<form asp-action="Delete" asp-route-id="@Model.Coll.Id" method="post">
-					<button type="submit" class="btn btn-danger px-4">Delete</button>
-				</form>
+				<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+					Delete
+				</button>
+
+				<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="exampleModalLabel">Attention</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								This action will delete model with all conected items!
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+								<form asp-action="Delete" asp-route-id="@Model.Coll.Id" method="post">
+									<button type="submit" class="btn btn-danger">Delete</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
 			}
 		</div>
 	</div>
@@ -71,7 +90,6 @@ else
 				<tr>
 					<th>ID</th>
 					<th>Title</th>
-					<th>Tags?</th>
 					@if(Model.AddStr != null)
 					{
 						foreach(var item in Model.AddStr)
@@ -88,7 +106,6 @@ else
 					<tr>
 						<td>@item.Id</td>
 						<td>@item.Title</td>
-						<td>tags?</td>
 						@if(item.ItemsAdditionalStrings != null)
 						{
 							foreach(var itemAddStr in item.ItemsAdditionalStrings)
@@ -106,7 +123,6 @@ else
 								}
 								@if ((await AuthorizationService.AuthorizeAsync(User, Model.Coll, CollectionOperations.Delete)).Succeeded)
 								{
-									@*make alert for deleting collection*@
 									<form method="post">
 										<button asp-controller="Item" asp-action="Delete" asp-route-id="@Model.Coll.Id" asp-route-itemId="@item.Id" type="submit" class="btn btn-danger">Delete</button>
 									</form>
@@ -119,4 +135,3 @@ else
 		</table>
 	</div>
 }
-

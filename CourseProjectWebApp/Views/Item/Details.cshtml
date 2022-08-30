@@ -15,13 +15,13 @@
 
     <dl class="row">
 
-        @foreach (var addStr in ViewBag.AdditionalStrings)
+        @foreach (var itemAddStrs in Model.ItemsAdditionalStrings)
         {
             <dt class="col-sm-2">
-                @addStr.Name
+                @itemAddStrs.AdditionalStrings!.Name
             </dt>
             <dd class="col-sm-10">
-                @Model.ItemsAdditionalStrings.Where(i => i.AdditionalStringsId == addStr.Id).First().Data
+                @itemAddStrs.Data
             </dd>
 
         }
@@ -31,21 +31,36 @@
         <dd class="col-sm-10">
             @foreach (var tag in Model.Tags)
             {
-                <a href="" class="">@tag.Name</a>
+                <a asp-action="TagItems" asp-controller="Collection" asp-route-id="@tag.Id">@tag.Name</a>
             }
+        </dd>
+        <dt class="col-sm-2">
+            Likes:
+        </dt>
+        <dd class="col-sm-10">
+            <span id="likesCount">@Model.ItemUserLikes.Count()</span>
         </dd>
     </dl>
 </div>
-<p>Likes: <span id="likesCount">@Model.ItemUserLikes.Count()</span></p>
-@if (User.Identity.IsAuthenticated)
-{
-    <button id="likeButton" class="btn-primary btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-      <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-    </svg> Like</button>
-}
+<div>
+    @if (User.Identity!.IsAuthenticated)
+    {
+        <button id="likeButton" class="btn-primary btn visually-hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+            </svg> Like
+        </button>
+        <button id="dislikeButton" class="btn-primary btn visually-hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heartbreak" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8.867 14.41c13.308-9.322 4.79-16.563.064-13.824L7 3l1.5 4-2 3L8 15a38.094 38.094 0 0 0 .867-.59Zm-.303-1.01c6.164-4.4 6.91-7.982 6.22-9.921C14.031 1.37 11.447.42 9.587 1.368L8.136 3.18l1.3 3.468a1 1 0 0 1-.104.906l-1.739 2.608.971 3.237Zm-1.25 1.137a36.027 36.027 0 0 1-1.522-1.116C-5.077 4.97 1.842-1.472 6.454.293c.314.12.618.279.904.477L5.5 3 7 7l-1.5 3 1.815 4.537Zm-2.3-3.06C.895 7.797.597 4.875 1.308 3.248c.756-1.73 2.768-2.577 4.456-2.127L4.732 2.36a1 1 0 0 0-.168.991L5.91 6.943l-1.305 2.61a1 1 0 0 0-.034.818l.442 1.106Z" />
+            </svg> Dislike
+        </button>
+    }
+</div>
+
 <hr />
 
-@if(User.Identity.IsAuthenticated)
+@if (User.Identity.IsAuthenticated)
 {
     <div class="row d-flex justify-content-center">
         <div class="col-md-8 col-lg-10">
@@ -81,10 +96,10 @@
                 }
             </div>
             <div class="form-outline mb-4">
+                <span class="text-danger" id="commentTextValidation"></span>
                 <div>
                     <textarea class="form-control" id="commentText"></textarea>
                 </div>
-                <span class="text-danger" id="commentTextValidation"></span>
                 <input type="submit" value="Add Comment" class="btn btn-primary mt-2 " id="submit" />
             </div>
         </div>
@@ -96,101 +111,14 @@
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
     <script>
-        $('#likeButton').click(function (event) {
-            event.preventDefault();
-            $.ajax({
-                type: "GET",
-                url: '@Url.Action("SetLike","ajax")',
-                data: {
-                    itemId: @Model.Id,
-                    userName: '@UserManager.GetUserName(User)',
-                },
-                success: function (msg) {
-                    $('#likeButton').addClass('disabled');
-                    console.log(msg);
-                },
-                error: function (req, status, error) {
-                    console.log(error);
-                }
-            });
-        });
-
-        $.ajax({
-            type: "GET",
-            url: '@Url.Action("IsLiked","ajax")',
-            data: {
-                itemId: @Model.Id,
-                userName: '@UserManager.GetUserName(User)',
-            },
-            success: function (msg) {
-                if(msg == 'true'){
-                    $('#likeButton').addClass('disabled');
-                }
-                console.log(msg)
-            },
-            error: function (req, status, error) {
-                console.log(error);
-            }
-        });
-       
-        var connection = new signalR.HubConnectionBuilder().withUrl("/comment").build();
-       
-        connection.on("Receive", function (data) {
-            fillTemplate(data[0], data[1], data[2]);
-        });
-
-        connection.on("increment", function () {
-            var likes = $('#likesCount').text();
-            likes++;
-            $('#likesCount').text(likes);
-        });
-
-        var group = "group" + @Model.Id;
-
-        connection.start().then(function () {
-            connection.invoke("AddToGroup", group);
-        }).catch(function (err) {
-            return console.error(err.toString());
-        });
-        $('#commentText').on('input', function () {
-            $('#commentTextValidation').text("");
-        });
-
-        $('#submit').click(function (event) {
-            event.preventDefault();
-            var text = $('#commentText').val();
-            var url = '@Url.Action("CreateComment", "Ajax")';
-            var user = '@UserManager.GetUserName(User)';
-            if (text == '') {
-                $('#commentTextValidation').text("Comment can't be empty");
-            }
-            else {
-                $('#commentText').val('');
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    data: {
-                        itemId: @Model.Id,
-                        userName: user,
-                        text: text
-                    },
-                    success: function (msg) {
-                        console.log('success')
-                    },
-                    error: function (req, status, error) {
-                        console.log(msg);
-                    }
-                });
-            }
-        });
-
-        function fillTemplate(commentText, userName, date){
-            var clone = $(".cloneItem").first().clone();
-            clone.find('.commentText').text(commentText);
-            clone.find('.commentUserName').text("User: " + userName);
-            clone.find('.commentDate').text("Date: " + date);
-            clone.removeClass('visually-hidden');
-            $('#commentList').append(clone);
-        }
+        const userName = '@UserManager.GetUserName(User)';
+        const modelId = '@Model.Id';
+        const urlIsLiked = '@Url.Action("IsLiked","ajax")';
+        const urlSetLike = '@Url.Action("SetLike","ajax")';
+        const urlUnsetLike = '@Url.Action("UnsetLike","ajax")';
+        const urlCreateComment = '@Url.Action("CreateComment", "Ajax")'
     </script>
+    <script src="~/js/likes.js"></script>
+    <script src="~/js/signalR.js"></script>
+    <script src="~/js/comment.js"></script>
 }

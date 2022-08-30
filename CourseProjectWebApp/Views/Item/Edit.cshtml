@@ -1,5 +1,5 @@
-﻿@model CourseProjectWebApp.Models.ViewModels.ItemItemAdditionalStringsViewModel
-@using CourseProjectWebApp.Models
+﻿@using CourseProjectWebApp.Models
+@model CourseProjectWebApp.Models.ViewModels.ItemTagsViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -11,10 +11,10 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="edit" asp-route-itemId="@Model.Item.Id" asp-route-id="@Model.Item.CollectionId" onsubmit="onSend();return false" id="form">
+        <form asp-controller="Item" asp-action="Edit" asp-route-itemId="@Model.Item.Id" asp-route-id="@ViewBag.Collection.Id" method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
-            <input type="hidden" asp-for="Item.Id" /> 
-            <input type="hidden" asp-for="Item.CollectionId"/>
+            <input type="hidden" asp-for="Item.Id" value="@Model.Item.Id" />
+            <input type="hidden" asp-for="Item.CollectionId" value="@Model.Item.CollectionId" />
             <div class="form-group">
                 <label asp-for="Item.Title" class="control-label"></label>
                 <input asp-for="Item.Title" class="form-control" />
@@ -23,42 +23,42 @@
             <div class="form-group" id="tagsForm">
                 <label for="tagName">Add tags</label>
                 <input class="form-control" id="tagName" />
-                <p class="visually-hidden" id="exTags">
-                    @foreach (var tag in Model.Item.Tags)
+                <div class="visually-hidden" id="allTags">
+                    @for (var i = 0; i < Model.Tags.Count; i++)
                     {
-                        <span>@tag.Name</span>
+                        <span>@Model.Tags[i].Name</span>
+                        <input asp-for="Tags[i].Name" value="@Model.Tags[i].Name">
                     }
-                </p>
-                
+                </div>
             </div>
-            @for (var i = 0; i < ViewBag.AdditionalStrings.Count; i++)
+            @for (var i = 0; i < ViewBag.Collection.AdditionalStrings.Count; i++)
             {
                 <div class="form-group">
-                    <label asp-for="ItemsAdditionals[i].Data" class="control-label">@ViewBag.AdditionalStrings[i].Name</label>
-                    <input type="hidden" value="@ViewBag.AdditionalStrings[i].Id" name="ItemsAdditionals[@i].AdditionalStringsId">
-                    @switch (ViewBag.AdditionalStrings[i].TypeOfData)
+                    <label asp-for="Item.ItemsAdditionalStrings[i].Data" class="control-label">@ViewBag.Collection.AdditionalStrings[i].Name</label>
+                    <input type="hidden" value="@ViewBag.Collection.AdditionalStrings[i].Id" name="Item.ItemsAdditionalStrings[@i].AdditionalStringsId">
+                    @switch (ViewBag.Collection.AdditionalStrings[i].TypeOfData)
                     {
                         case AdditionalStrings.TypesOfData.integer:
-                            <input class="form-control" type="number" asp-for="ItemsAdditionals[i].Data" />
+                            <input class="form-control" type="number" asp-for="Item.ItemsAdditionalStrings[i].Data" />
                             break;
                         case AdditionalStrings.TypesOfData.title:
-                            <input class="form-control" type="text" asp-for="ItemsAdditionals[i].Data" />
+                            <input class="form-control" type="text" asp-for="Item.ItemsAdditionalStrings[i].Data" />
                             break;
                         case AdditionalStrings.TypesOfData.text:
-                            <textarea class="form-control" asp-for="ItemsAdditionals[i].Data"></textarea>
+                            <textarea class="form-control" asp-for="Item.ItemsAdditionalStrings[i].Data"></textarea>
                             break;
                         case AdditionalStrings.TypesOfData.boolean:
-                            <input type="radio" asp-for="ItemsAdditionals[i].Data" value="@ViewBag.AdditionalStrings[i].Name" />
+                            <input type="radio" asp-for="Item.ItemsAdditionalStrings[i].Data" value="@ViewBag.Collection.AdditionalStrings[i].Name" />
                             break;
                         case AdditionalStrings.TypesOfData.date:
-                            <input class="form-control" type="date" asp-for="ItemsAdditionals[i].Data" />
+                            <input class="form-control" type="date" asp-for="Item.ItemsAdditionalStrings[i].Data" />
                             break;
                         default:
                             <p>Something went wrong</p>
                             break;
                     }
-                    <input type="hidden" asp-for="ItemsAdditionals[i].Id" value="@Model.ItemsAdditionals[i].Id" />
-                    <span asp-validation-for="ItemsAdditionals[i].Data" class="text-danger"></span>
+                    <input type="hidden" asp-for="Item.ItemsAdditionalStrings[i].Id" value="@Model.Item.ItemsAdditionalStrings[i].Id" />
+                    <span asp-validation-for="Item.ItemsAdditionalStrings[i].Data" class="text-danger"></span>
                 </div>
             }
             <div class="form-group">
@@ -68,29 +68,19 @@
     </div>
 </div>
 
-<div>
-    <a asp-controller="collection" asp-action="details" asp-route-id="@ViewData["collectionId"]">Back to List</a>
-</div>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="https://cdn.jsdelivr.net/npm/@@yaireo/tagify"></script>
     <script src="https://cdn.jsdelivr.net/npm/@@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
-    <script src="~/js/tags.js" asp-append-version="true"></script>
     <script>
-        var input = document.getElementById('tagName'),
-            tagify = new Tagify(input, { whitelist: [] });
-        tagify.on('input', onInput);
-        tagify.addTags([addTags()])
-
         function onInput(e) {
             checkAlert();
             var value = e.detail.value;
             tagify.whitelist = null;
             tagify.dropdown.hide();
-            fetch('@Url.Action("GetTag", "Item")' + '?term=' + value)
+            fetch('@Url.Action("GetTag", "Ajax")' + '?term=' + value)
                 .then(RES => RES.json())
                 .then(function (newWhitelist) {
                     tagify.whitelist = newWhitelist;
@@ -98,4 +88,5 @@
                 });
         }
     </script>
+    <script src="~/js/tags.js" asp-append-version="true"></script>
 	}

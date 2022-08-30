@@ -47,7 +47,8 @@ builder.Services.AddSingleton<IAuthorizationHandler,
 builder.Services.AddSignalR();
 
 builder.Services.AddScoped<IAjaxService, AjaxService>();
-
+builder.Services.AddScoped<ICollectionService, CollectionService>();
+builder.Services.AddScoped<IItemService, ItemService>();
 
 var app = builder.Build();
 

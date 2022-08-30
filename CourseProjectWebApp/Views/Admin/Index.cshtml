@@ -49,7 +49,7 @@
 			<table class="table">
 				<thead>
 					<tr>
-						<th><input type="checkbox" name="cb_all" /></th>
+						<th><input type="checkbox" name="cb_all" class="form-check-input" /></th>
 						<th>ID</th>
 						<th>Email</th>
 						<th>UserName</th>
@@ -63,7 +63,7 @@
 					@foreach (var item in Model)
 					{
 						<tr>
-							<td><input type="checkbox" value="@item.User.Id" name="AreChecked" class="cb" /></td>
+							<td><input type="checkbox" value="@item.User.Id" name="AreChecked" class="form-check-input cb" /></td>
 							<td>@item.User.Id</td>
 							<td>@item.User.Email</td>
 							<td>@item.User.UserName</td>

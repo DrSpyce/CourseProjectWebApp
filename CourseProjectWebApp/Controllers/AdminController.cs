@@ -20,6 +20,7 @@ namespace CourseProjectWebApp.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly CourseProjectWebAppContext _context;
 
         [BindProperty]
         public List<string> AreChecked { get; set; }
@@ -35,14 +36,14 @@ namespace CourseProjectWebApp.Controllers
 
         private bool LogOut = false;
 
-        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager)
+        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, CourseProjectWebAppContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
+            _context = context;
         }
 
-        // GET: Admin
         public async Task<IActionResult> Index()
         {
             await GetUsers();
@@ -78,11 +79,19 @@ namespace CourseProjectWebApp.Controllers
             await SetAreCheckedUsers();
             foreach (var user in Users)
             {
-                Results.Add(await _userManager.DeleteAsync(user));
+                Results.Add(await DeleteUser(user));
             }
             await CheckIfLogOut();
             SetMessage("deleted");
             return RedirectToAction("Index", "Admin");
+        }
+
+        private async Task<IdentityResult> DeleteUser(ApplicationUser user)
+        {
+            var r = await _context.ApplicationUser.Include(u => u.Collections).Where(u => u.Id == user.Id).FirstOrDefaultAsync();
+            _context.ApplicationUser.Remove(r);
+            await _context.SaveChangesAsync();
+            return IdentityResult.Success;
         }
 
         [HttpPost]

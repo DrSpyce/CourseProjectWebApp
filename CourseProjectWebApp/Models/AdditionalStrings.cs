@@ -13,6 +13,8 @@ namespace CourseProjectWebApp.Models
         [Required]
         public TypesOfData? TypeOfData { get; set; }
 
+        public bool Display { get; set; } = true;
+
         [BindNever]
         public int? CollectionId { get; set; }
 

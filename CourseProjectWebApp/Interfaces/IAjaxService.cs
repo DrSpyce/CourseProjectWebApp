@@ -11,7 +11,11 @@ namespace CourseProjectWebApp.Interfaces
 
         public Task<bool> SetLike(int? itemId, string userName);
 
+        public Task<bool> UnsetLike(int? itemId, string userName);
+
         public JsonResult SearchItem(string str, int numberOfResults = 5);
+
+        public Task<List<string>> GetTag(string term);
 
         public class SearchResult
         {

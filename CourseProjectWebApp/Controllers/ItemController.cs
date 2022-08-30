@@ -13,48 +13,36 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using CourseProjectWebApp.Hubs;
+using CourseProjectWebApp.Interfaces;
 
 namespace CourseProjectWebApp.Controllers
 {
     public class ItemController : Controller
     {
         private readonly CourseProjectWebAppContext _context;
-        private readonly IAuthorizationService _authorizationService;
-        private List<Tag> Tags = new();
-        
+        private readonly IItemService _itemService;
+        private readonly ICollectionService _collectionService;
 
-        public ItemController(CourseProjectWebAppContext context, IAuthorizationService AuthorizationService, IHubContext<CommentHub> hubContext)
+        public ItemController(CourseProjectWebAppContext context,
+            IItemService itemService, ICollectionService collectionService)
         {
             _context = context;
-            _authorizationService = AuthorizationService;
+            _itemService = itemService;
+            _collectionService = collectionService;
         }
 
-        ItemItemAdditionalStringsViewModel? ItemData;
-
-        // GET: Items/Details/5
         [Route("Collection/{id:int}/Item/{itemId:int}")]
         public async Task<IActionResult> Details(int? id, int? itemId)
         {
-            if (id == null || _context.Item == null || itemId == null)
+            if (id == null || itemId == null)
             {
                 return NotFound();
             }
-            var collection = await _context.Collection.FirstOrDefaultAsync(c => c.Id == id);
-            var item = await _context.Item
-                .Include(i => i.ItemsAdditionalStrings)
-                .Include(i => i.Tags)
-                .Include(i => i.Comments)
-                .Include(i => i.ItemUserLikes)
-                .FirstOrDefaultAsync(m => m.Id == itemId);
-            if (item == null || collection == null)
+            var item = await _itemService.Details((int)id, (int)itemId);
+            if (item == null)
             {
                 return NotFound();
             }
-            foreach(var comment in item.Comments)
-            {
-                comment.ApplicationUser = _context.ApplicationUser.FirstOrDefault(a => a.Id == comment.ApplicationUserId);
-            }
-            await SetAdditionalDataForCreate(id);
             return View(item);
         }
 
@@ -62,16 +50,15 @@ namespace CourseProjectWebApp.Controllers
         [Route("Collection/{id:int}/Item/Create")]
         public async Task<IActionResult> Create(int id)
         {
-            var collection = _context.Collection.Where(c => c.Id == id).FirstOrDefault();
-            if (collection == null)
+            ViewBag.Collection = await _itemService.SetAdditionalDataForCreate(id);
+            if (ViewBag.Collection == null)
             {
                 return NotFound();
             }
-            if (!IsAllowed(collection, CollectionOperations.Create).Result)
+            if (!await _collectionService.IsAllowed(ViewBag.Collection, CollectionOperations.Create, User))
             {
                 return Forbid();
             }
-            await SetAdditionalDataForCreate(id);
             return View();
         }
 
@@ -79,130 +66,64 @@ namespace CourseProjectWebApp.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [Route("Collection/{id:int}/Item/Create")]
-        public async Task<IActionResult> Create(int? id, ItemItemAdditionalStringsViewModel itemAddStrings)
+        public async Task<IActionResult> Create(int? id, ItemTagsViewModel itemTags)
         {
             if (ModelState.IsValid)
             {
-                itemAddStrings.Item.Collection = _context.Collection.Find(id);
-                if (itemAddStrings.Item.Collection == null)
+                itemTags.Item.Collection = await _context.Collection.FirstOrDefaultAsync(c => c.Id == id);
+                if (itemTags.Item.Collection == null)
                 {
                     return NotFound();
                 }
-                if (!IsAllowed(itemAddStrings.Item.Collection, CollectionOperations.Create).Result)
+                if (!await _collectionService.IsAllowed(itemTags.Item.Collection, CollectionOperations.Create, User))
                 {
                     return Forbid();
                 }
-                await CreateItem(itemAddStrings);
-                await _context.SaveChangesAsync();
+                await _itemService.CreateItem(itemTags);
                 return RedirectToRoute(new { controller = "Collection", action = "Details", id });
             }
-            await SetAdditionalDataForCreate(id);
-            return View(itemAddStrings);
+            ViewBag.Collection = await _itemService.SetAdditionalDataForCreate(id);
+            return View(itemTags.Item);
         }
 
-        private async Task CreateItem(ItemItemAdditionalStringsViewModel itemAddStrings)
-        {
-            await GetOrCreateTags(itemAddStrings.Item.Tags);
-            itemAddStrings.Item.Tags = Tags;
-            _context.Item.Add(itemAddStrings.Item);
-            foreach (var itmStr in itemAddStrings.ItemsAdditionals)
-            {
-                itmStr.Item = itemAddStrings.Item;
-                _context.ItemsAdditionalStrings.Add(itmStr);
-            }
-        }
-
-        private async Task SetAdditionalDataForCreate(int? id)
-        {
-            ViewData["collectionId"] = id;
-            ViewBag.AdditionalStrings = await _context.AdditionalStrings.Where(a => a.CollectionId == id).ToListAsync();
-        }
-
-        // GET: Items/Edit/5
         [Authorize]
         [Route("Collection/{id:int}/Item/Edit/{itemId:int}")]
         public async Task<IActionResult> Edit(int? itemId, int? id)
         {
-            var collection = await _context.Collection.FirstOrDefaultAsync(c => c.Id == id);
-            if (itemId == null || collection == null || !await CheckData(itemId))
+            ViewBag.Collection = await _itemService.SetAdditionalDataForCreate(id);
+            var data = await _itemService.FillData(itemId);
+            if (itemId == null || ViewBag.Collection == null || data == null)
             {
                 return NotFound();
             }
-            if (!IsAllowed(collection, CollectionOperations.Update).Result)
+            if (!await _collectionService.IsAllowed(ViewBag.Collection, CollectionOperations.Create, User))
             {
                 return Forbid();
             }
-            ViewBag.AdditionalStrings = _context.AdditionalStrings.Where(a => a.CollectionId == id).ToList();
-            return View(ItemData);
+            return View(data);
         }
 
-        private async Task<bool> CheckData(int? id)
-        {
-            var item = await _context.Item.Include(i => i.Tags).FirstOrDefaultAsync(i => i.Id == id);
-            if (item == null) { return false; }
-            await FillData(item);
-            return true;
-        }
-
-        private async Task FillData(Item item)
-        {
-            ItemData = new();
-            ItemData.Item = item;
-            ItemData.ItemsAdditionals = await _context.ItemsAdditionalStrings.Where(i => i.Item == item).ToListAsync();
-        }
-
-        // POST: Items/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
         [Route("Collection/{id:int}/Item/Edit/{itemId:int}")]
-        public async Task<IActionResult> Edit(int itemId, int id, ItemItemAdditionalStringsViewModel itemAddStrings)
+        public async Task<IActionResult> Edit(int itemId, int id, ItemTagsViewModel itemTags)
         {
-            if (itemId != itemAddStrings.Item.Id)
+            if (itemId != itemTags.Item.Id && id != itemTags.Item.CollectionId)
             {
                 return NotFound();
             }
+            if (!await _collectionService.IsAllowed(id, CollectionOperations.Create, User))
+            {
+                return Forbid();
+            }
             if (ModelState.IsValid)
             {
-                try
-                {
-                    await GetOrCreateTags(itemAddStrings.Item.Tags);
-                    foreach (var itemAdd in itemAddStrings.ItemsAdditionals)
-                    {
-                        var result = _context.ItemsAdditionalStrings.Find(itemAdd.Id);
-                        if(result == null)
-                        {
-                            return NotFound();
-                        }
-                        result.Data = itemAdd.Data;
-                    }
-                    Item? item = _context.Item.Include(i => i.Tags).FirstOrDefault(i => i.Id == itemAddStrings.Item.Id);
-                    if (item == null)
-                    {
-                        return NotFound();
-                    }
-                    item.Tags.Clear();
-                    item.Title = itemAddStrings.Item.Title;
-                    item.Tags = Tags;
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ItemExists(itemAddStrings.Item.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _itemService.UpdateItem(itemTags);
                 return RedirectToRoute(new { controller = "Collection", action = "Details", id });
             }
-            ViewBag.AdditionalStrings = _context.AdditionalStrings.Where(a => a.CollectionId == id).ToList();
-            return View(itemAddStrings);
+            ViewBag.Collection = await _itemService.SetAdditionalDataForCreate(id);
+            return View(itemTags);
         }
 
         [HttpPost, ActionName("Delete")]
@@ -211,58 +132,15 @@ namespace CourseProjectWebApp.Controllers
         [Route("Collection/{id:int}/Item/Delete/{itemId:int}")]
         public async Task<IActionResult> DeleteConfirmed(int itemId, int id)
         {
-            var item = await _context.Item.FindAsync(itemId);
-            if (item != null)
+            if (!await _collectionService.IsAllowed(id, CollectionOperations.Create, User))
             {
-                DeleteConnected(item);
-                _context.Item.Remove(item);
+                return Forbid();
             }
-            await _context.SaveChangesAsync();
+            if(!await _itemService.DeleteConfirmed(itemId))
+            {
+                return NotFound();
+            }
             return RedirectToRoute(new { controller = "Collection", action = "Details", id });
         }
-
-        private bool ItemExists(int id)
-        {
-          return (_context.Item?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
-
-        private void DeleteConnected(Item item)
-        {
-            var itemAddStrs = _context.ItemsAdditionalStrings.Where(i => i.Item == item).ToArray();
-            _context.ItemsAdditionalStrings.RemoveRange(itemAddStrs);
-        }
-
-        private async Task GetOrCreateTags(List<Tag> tags)
-        {
-            foreach(var tag in tags)
-            {
-                var tagFromDb = await _context.Tag.Where(t => t.Name == tag.Name).FirstOrDefaultAsync();
-                if (tagFromDb == null)
-                {
-                    tagFromDb = new Tag { Name = tag.Name };
-                    _context.Tag.Add(tagFromDb);
-                    _context.SaveChanges();
-                }
-                Tags.Add(tagFromDb);
-            }
-        }
-
-        public async Task<IActionResult> GetTagAsync(string term)
-        {
-            var tags = await _context.Tag.Where(t => t.Name.Contains(term)).Select(t => t.Name).ToListAsync();
-            return new JsonResult(tags);
-        }
-
-        private async Task<bool> IsAllowed(Collection? coll, OperationAuthorizationRequirement task)
-        {
-            if(coll == null)
-            {
-                return true;
-            }
-            var isAuthorized = await _authorizationService.AuthorizeAsync(User, coll, task);
-            return isAuthorized.Succeeded;
-        }
-
-        
     }
 }

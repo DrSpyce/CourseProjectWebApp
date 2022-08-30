@@ -6,6 +6,6 @@
 
         public List<AdditionalStrings> AddStr { get; set; } = new();
 
-        public List<Item> Items { get; set; }
+        public List<Item> Items { get; set; } = new();
     }
 }

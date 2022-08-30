@@ -1,5 +1,5 @@
 ﻿@using CourseProjectWebApp.Models
-@model CourseProjectWebApp.Models.ViewModels.CollectionAdditionalStringsViewModel
+@model CourseProjectWebApp.Models.Collection
 
 @{
 	ViewData["Title"] = "Edit";
@@ -8,41 +8,47 @@
 <h1 class="text-center">Edit</h1>
 <h4 class="text-center">Collection</h4>
 
-<form asp-action="Edit" asp-route-id="@Model.Coll.Id" method="post">
+<form asp-action="edit" asp-controller="collection" asp-route-id="@Model.Id" method="post">
 	<div class="row d-flex justify-content-center">
 		<div class="col-md-4 ">
 			<div asp-validation-summary="All" class="text-danger"></div>
-			<input type="hidden" asp-for="Coll.Id" />
-			<input type="hidden" asp-for="Coll.ApplicationUserId" />
+			<input type="hidden" asp-for="Id" />
+			<input type="hidden" asp-for="ApplicationUserId" />
 			<div class="form-group">
-				<label asp-for="Coll.Title" class="control-label"></label>
-				<input asp-for="Coll.Title" class="form-control" />
-				<span asp-validation-for="Coll.Title" class="text-danger"></span>
+				<label asp-for="Title" class="control-label"></label>
+				<input asp-for="Title" class="form-control" />
+				<span asp-validation-for="Title" class="text-danger"></span>
 			</div>
 			<div class="form-group">
-				<label asp-for="Coll.Description" class="control-label"></label>
-				<input asp-for="Coll.Description" class="form-control" />
-				<span asp-validation-for="Coll.Description" class="text-danger"></span>
+				<label asp-for="Description" class="control-label"></label>
+				<input asp-for="Description" class="form-control" />
+				<span asp-validation-for="Description" class="text-danger"></span>
 			</div>
 			<div class="form-group">
-				<label asp-for="Coll.Topic" class="control-label"></label>
-				<select asp-for="Coll.Topic" class="form-control" asp-items="Html.GetEnumSelectList<Collection.Topics>()"></select>
-				<span asp-validation-for="Coll.Topic" class="text-danger"></span>
+				<label asp-for="Topic" class="control-label"></label>
+				<select asp-for="Topic" class="form-control" asp-items="Html.GetEnumSelectList<Collection.Topics>()"></select>
+				<span asp-validation-for="Topic" class="text-danger"></span>
 			</div>
 		</div>
 	</div>
 	<div class="row mt-2">
 		<h4 class="text-center">Additional strings</h4>
-		@for(var i = 0; i < Model.AddStr.Count; i++)
+		@for(var i = 0; i < Model.AdditionalStrings.Count; i++)
 		{
 			<div class="col-md-4">
-				<input type="hidden" asp-for="@Model.AddStr[i].Id" />
-				<input type="hidden" asp-for="@Model.AddStr[i].TypeOfData" value="@Model.AddStr[i].TypeOfData" />
+				<input type="hidden" asp-for="@Model.AdditionalStrings[i].Id" />
+				<input type="hidden" asp-for="@Model.AdditionalStrings[i].TypeOfData" value="@Model.AdditionalStrings[i].TypeOfData" />
 				<div class="form-group">
-					<label asp-for="@Model.AddStr[i].Name" class="control-label"></label>
-					<input asp-for="@Model.AddStr[i].Name" class="form-control" />
-					<span asp-validation-for="@Model.AddStr[i].Name" class="text-danger"></span>
+					<label asp-for="@Model.AdditionalStrings[i].Name" class="control-label"></label>
+					<input asp-for="@Model.AdditionalStrings[i].Name" class="form-control" />
+					<span asp-validation-for="@Model.AdditionalStrings[i].Name" class="text-danger"></span>
 				</div>
+				<div class="form-group">
+					<label asp-for="@Model.AdditionalStrings[i].Display" class="control-label"></label>
+					<input asp-for="@Model.AdditionalStrings[i].Display" type="checkbox" class="form-check-input">
+					<span asp-validation-for="@Model.AdditionalStrings[i].Display" class="text-danger"></span>
+				</div>
+				
 			</div>
 		}
 	</div>
@@ -50,9 +56,6 @@
 		<input type="submit" value="Save" class="btn btn-primary px-4" />
 	</div>
 </form>
-<div class="d-flex justify-content-center">
-	<a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
 	@{

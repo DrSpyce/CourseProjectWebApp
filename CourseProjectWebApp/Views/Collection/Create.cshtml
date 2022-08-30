@@ -1,5 +1,5 @@
 ﻿@using CourseProjectWebApp.Models
-@model CourseProjectWebApp.Models.ViewModels.CollectionAdditionalStringsViewModel
+@model CourseProjectWebApp.Models.Collection
 
 @{
 	ViewData["Title"] = "Create";
@@ -8,61 +8,108 @@
 <h1 class="text-center">Create Collection</h1>
 <div class="row">
 	<form asp-action="Create" method="post">
-		<div asp-validation-summary="All" class="text-danger"></div>
 		<div class="row justify-content-center align-items-center">
-			<div class="col-lg-4 mt-2">
-				<h2 class="fs-6 text-center">Collection data</h2>
-				<div class="form-group mb-4">
-					<label asp-for="Coll.Title" class="control-label"></label>
-					<input asp-for="Coll.Title" class="form-control" />
-					<span asp-validation-for="Coll.Title" class="text-danger"></span>
-				</div>
-				<div class="form-group mb-4">
-					<label asp-for="Coll.Description" class="control-label">Description (You can write Markdown here)</label>
-					<input asp-for="Coll.Description" class="form-control" />
-					<span asp-validation-for="Coll.Description" class="text-danger"></span>
-				</div>
-				<div class="form-group mb-4">
-					<label asp-for="Coll.Topic" class="control-label"></label>
-					<select asp-for="Coll.Topic" class="form-control" asp-items="Html.GetEnumSelectList<Collection.Topics>()"></select>
-					<span asp-validation-for="Coll.Topic" class="text-danger"></span>
-				</div>
-			</div>
-			<div class="col-lg-8">
-				@for(var i = 0; i < 3; i++)
-				{
-					<h2 class="fs-6 text-center">Additional string @i</h2>
-					<div class="row g-3 justify-content-center mb-2">
-						<div class="col-auto">
-							<div class="form-group">
-								<label asp-for="AddStr[i].Name" class="control-label justify-content-center"></label>
-								<input asp-for="AddStr[i].Name" class="form-control">
-								<span asp-validation-for="AddStr[i].Name" class="text-danger"></span>
-							</div>
-						</div>
-						<div class="col-auto">
-							<div class="form-group">
-								<label asp-for="AddStr[i].TypeOfData" class="control-label">Type Of Data</label>
-								<select asp-for="AddStr[i].TypeOfData" class="form-control" asp-items="Html.GetEnumSelectList<AdditionalStrings.TypesOfData>()"></select>
-								<span asp-validation-for="AddStr[i].TypeOfData" class="text-danger"></span>
-							</div>
-						</div>
-					</div>
-				}
-				
+			<div class="col-3">
+				<div asp-validation-summary="All" class="text-danger"></div>
 			</div>
 		</div>
-		<div class="row mt-1 justify-content-center">
-			<input type="submit" value="Create" class="btn btn-primary w-25" />
+		<div class="row justify-content-center align-items-center">
+			<div class="col-lg-6 mt-2">
+				<h2 class="fs-6 text-center">Collection data</h2>
+				<div class="form-group mb-4">
+					<label asp-for="Title" class="control-label"></label>
+					<input asp-for="Title" class="form-control" />
+					<span asp-validation-for="Title" class="text-danger"></span>
+				</div>
+				<div class="form-group mb-4">
+					<label asp-for="Topic" class="control-label"></label>
+					<select asp-for="Topic" class="form-control" asp-items="Html.GetEnumSelectList<Collection.Topics>()"></select>
+					<span asp-validation-for="Topic" class="text-danger"></span>
+				</div>
+				<div class="form-group mb-4">
+					<label asp-for="Description" class="control-label">Description (You can write Markdown here)</label>
+					<input asp-for="Description" class="form-control" />
+					<span asp-validation-for="Description" class="text-danger"></span>
+				</div>
+			</div>
+		</div>
+		<div class="row justify-content-center align-items-center">
+			<div class="justify-content-center text-center">
+				<button id="addAdditional" class="btn btn-primary">Add additional string</button>
+			</div>
+				<div class="row mt-3" id="additionalFields">
+				@if (Model is not null && Model.AdditionalStrings is not null)
+				{
+					int i = 0;
+					int s = 1;
+					<p id="counterOfAddStr" class="visually-hidden">@Model.AdditionalStrings.Count</p>
+					@foreach (var addStrs in Model.AdditionalStrings)
+					{
+						<div class="col-md-4 mb-3">
+							<div class="card">
+								<div class="card-body">
+									<h2 class="fs-6 text-center">Additional string <span>@s</span></h2>
+										<div class="justify-content-center">
+											<div class="col-auto">
+												<div class="form-group additionalStringName">
+													<label asp-for="AdditionalStrings[i].Name" class="control-label justify-content-center"></label>
+													<input asp-for="AdditionalStrings[i].Name" class="form-control">
+													<span asp-validation-for="AdditionalStrings[@i].Name" class="text-danger"></span>
+												</div>
+											</div>
+											<div class="col-auto">
+												<div class="form-group additionalTypeOfData">
+													<label asp-for="AdditionalStrings[i].TypeOfData" class="control-label">Type Of Data</label>
+													<select asp-for="AdditionalStrings[i].TypeOfData" class="form-control" asp-items="Html.GetEnumSelectList<AdditionalStrings.TypesOfData>()"></select>
+													<span asp-validation-for="AdditionalStrings[i].TypeOfData" class="text-danger"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+						</div>
+						i++;
+						s++;
+					}
+				}
+			</div>
+		</div>
+		
+		<div class="row mt-1 justify-content-center text-center">
+			<div>
+				<input type="submit" value="Create" class="btn btn-success px-5 fs-5" />
+			</div>
 		</div>
 	</form>
 </div>
-<div class="justify-content-center mt-1 row">
-	<a class="text-center" asp-action="Index">Back to List</a>
+
+<div class="formClone visually-hidden col-md-4 mb-3">
+	<div class="card">
+		<div class="card-body">
+			<h2 class="fs-6 text-center">Additional string <span>-1</span></h2>
+			<div class="justify-content-center">
+				<div class="col-auto">
+					<div class="form-group additionalStringName">
+						<label class="control-label justify-content-center">Name</label>
+						<input class="form-control" type="text" data-val="true" data-val-required="The Name field is required.">
+						<span data-valmsg-replace="true" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="col-auto">
+					<div class="form-group additionalTypeOfData">
+						<label class="control-label">Type Of Data</label>
+						<select data-val="true" data-val-required="The TypeOfData field is required." class="form-control" asp-items="Html.GetEnumSelectList<AdditionalStrings.TypesOfData>()"></select>
+						<span data-valmsg-replace="true" class="text-danger"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 @section Scripts {
 	@{
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
+	<script src="~/js/collectionCreate.js"></script>
 	}

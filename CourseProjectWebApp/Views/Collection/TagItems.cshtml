@@ -1,0 +1,44 @@
+﻿@using CourseProjectWebApp.Authorization;
+@using Microsoft.AspNetCore.Authorization
+@using static CourseProjectWebApp.Authorization.ProjectConstans
+@model CourseProjectWebApp.Models.Tag
+
+@{
+    ViewData["Title"] = "Mine";
+}
+
+<h1 class="fs-3">Tag: @Model.Name</h1>
+@if(Model.Items.Count > 0)
+{
+    <div class="list-group">
+        <table class="table text-center">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Collection title</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Title</td>
+                        <td>@item.Collection!.Title</td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <a asp-controller="item" asp-action="Details" asp-route-id="@item.Collection.Id" asp-route-itemId="@item.Id" class="btn btn-primary">Show</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p>This Tag don't have items!</p>
+}

@@ -1,4 +1,5 @@
 ﻿using CourseProjectWebApp.Data;
+using CourseProjectWebApp.Interfaces;
 using CourseProjectWebApp.Models;
 using CourseProjectWebApp.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -12,28 +13,17 @@ namespace CourseProjectWebApp.Controllers
 {
     public class CollectionController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ICollectionService _collectionService;
         private readonly CourseProjectWebAppContext _context;
-        private readonly IAuthorizationService _authorizationService;
+
+        public CollectionController(CourseProjectWebAppContext context, ICollectionService collectionService)
+        {
+            _context = context;
+            _collectionService = collectionService;
+        }
 
         [TempData]
-        public string Message { get; set; }
-
-        private CollectionItemsViewModel ColItems = new();
-
-        private CollectionAdditionalStringsViewModel CollAddStr = new();
-
-        private Collection Col { get; set; }
-
-        public CollectionController(UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager, CourseProjectWebAppContext context, IAuthorizationService authorizationService)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _context = context;
-            _authorizationService = authorizationService;
-        }
+        public string? Message { get; set; }
 
         public async Task<ActionResult> IndexAsync()
         {
@@ -45,24 +35,35 @@ namespace CourseProjectWebApp.Controllers
         [Authorize]
         public async Task<ActionResult> Mine()
         {
-            var currentUser = await _userManager.FindByNameAsync(User.Identity.Name);
-            var result = _context.Collection.Include(c => c.ApplicationUser).Where(c => c.ApplicationUser == currentUser).ToList();
-            ViewData["Message"] = Message;
-            return View(result);
+            if (User.Identity!.Name != null)
+            {
+                var result = await _collectionService.Mine(User.Identity!.Name!);
+                ViewData["Message"] = Message;
+                return View(result);
+            }
+            return NotFound();
         }
 
         [Route("Collection/{id:int}")]
         public async Task<ActionResult> DetailsAsync(int id)
         {
-            ColItems.Coll = await _context.Collection.FindAsync(id);
-            if (ColItems.Coll == null)
+            var result = await _collectionService.DetailsAsync(id);
+            if (result == null)
             {
                 return NotFound();
             }
-            ColItems.Items = _context.Item.Where(i => i.Collection == ColItems.Coll).ToList();
-            ViewBag.returnUrl = Request.Headers["Referer"].ToString();
-            AttachItemAddithionalStrings();
-            return View(ColItems);
+            return View(result);
+        }
+
+        [Route("Collection/Tag/{id:int}")]
+        public async Task<ActionResult> TagItems(int id)
+        {
+            var tag = await _context.Tag.Include(t => t.Items).ThenInclude(i => i.Collection).Where(t => t.Id == id).FirstAsync();
+            if (tag == null)
+            {
+                return NotFound();
+            }
+            return View(tag);
         }
 
         [Authorize]
@@ -74,142 +75,71 @@ namespace CourseProjectWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<ActionResult> CreateAsync(CollectionAdditionalStringsViewModel collectionStrings)
+        public async Task<ActionResult> CreateAsync(Collection coll)
         {
-            try
+            var check = await _context.Collection.FirstOrDefaultAsync(c => c.Title == coll.Title);
+            if(check is not null)
             {
-                if (!ModelState.IsValid) { return View(); }
-                collectionStrings.Coll.ApplicationUser = await _userManager.FindByNameAsync(User.Identity.Name);
-                await _context.Collection.AddAsync(collectionStrings.Coll);
-                foreach (var addStrs in collectionStrings.AddStr)
-                {
-                    addStrs.Collection = collectionStrings.Coll;
-                    await _context.AdditionalStrings.AddAsync(addStrs);
-                }
-                _context.SaveChanges();
-                Message = $"{collectionStrings.Coll.Title} created";
-                return RedirectToAction(nameof(Mine));
+                ModelState.AddModelError("Title", "Collection with that name already exist");
             }
-            catch (Exception e)
-            {
-                return View();
+            if (!ModelState.IsValid)
+            { 
+                return View(coll); 
             }
+            Message = await _collectionService.CreateCollection(coll, User);
+            return RedirectToAction(nameof(Mine));
         }
 
-        [Route("/Collection/Edit/{id}")]
+        [Route("/Collection/Edit/{id:int}")]
         [Authorize]
         public async Task<ActionResult> EditAsync(int? id)
         {
-            CollAddStr.Coll = await _context.Collection.FirstOrDefaultAsync(c => c.Id == id);
-            if (id == null || CollAddStr.Coll == null)
+            var result = await _context.Collection.Include(c => c.AdditionalStrings).FirstOrDefaultAsync(c => c.Id == id);
+            if (id == null || result == null)
             {
                 return NotFound();
             }
-            if (!IsAllowed(CollAddStr.Coll, CollectionOperations.Update).Result)
+            if (!await _collectionService.IsAllowed(result, CollectionOperations.Update, User))
             {
                 return Forbid();
             }
-            CollAddStr.AddStr = await _context.AdditionalStrings.Where(a => a.Collection == CollAddStr.Coll).ToListAsync();
-            return View(CollAddStr);
+            return View(result);
         }
 
-        [Route("Collection/Edit/{id}")]
+        [Route("Collection/Edit/{id:int}")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<ActionResult> EditAsync(int id, CollectionAdditionalStringsViewModel collectionStrings)
+        public async Task<ActionResult> EditAsync(int id, Collection coll)
         {
-            if (id != collectionStrings.Coll.Id)
+            if (id != coll.Id)
             {
                 return NotFound();
             }
-            var collection = _context.Collection.AsNoTracking().FirstOrDefault(c => c.Id == id);
-            if (!IsAllowed(collection, CollectionOperations.Update).Result)
+            if (!await _collectionService.IsAllowed(id, CollectionOperations.Delete, User))
             {
                 return Forbid();
             }
             if (ModelState.IsValid)
             {
-                collectionStrings.Coll.ApplicationUserId = collection.ApplicationUserId;
-                _context.Update(collectionStrings.Coll);
-                foreach (var addStr in collectionStrings.AddStr)
-                {
-                    addStr.Collection = collectionStrings.Coll;
-                    _context.Update(addStr);
-                }
-                await _context.SaveChangesAsync();
-                Message = $"{collectionStrings.Coll.Title} edited";
+                await _collectionService.EditAsync(id, coll);
+                Message = $"{coll.Title} edited";
                 return RedirectToAction(nameof(Mine));
             }
-            return View(collectionStrings);
-        }
-
-        private bool CollectionExists(int id)
-        {
-            return (_context.Collection?.Any(e => e.Id == id)).GetValueOrDefault();
+            return View(coll);
         }
 
         [HttpPost]
         [Authorize]
         public async Task<ActionResult> DeleteAsync(int id)
         {
-            var coll = await _context.Collection.FindAsync(id);
-            var result = IsAllowed(coll, CollectionOperations.Delete);
-            if (!result.Result)
+            if (!await _collectionService.IsAllowed(id, CollectionOperations.Delete, User))
             {
                 return Forbid();
             }
-            string collTitle = coll.Title;
-            if (coll != null)
-            {
-                await DeleteConnected(coll);
-                await DeleteItems(coll);
-                _context.Collection.Remove(coll);
-                Message = $"{collTitle} deleted";
-            }
-            await _context.SaveChangesAsync();
+            string collTitle = await _collectionService.DeleteAsync(id);
+            Message = $"{collTitle} deleted";
             return RedirectToAction(nameof(Mine));
-        }
-
-        private async Task DeleteConnected(Collection coll)
-        {
-            var addStrs = _context.AdditionalStrings.Where(a => a.Collection == coll).ToList();
-            foreach (var item in addStrs)
-            {
-                var ItemAddStr = _context.ItemsAdditionalStrings.Where(i => i.AdditionalStrings == item).ToList();
-                _context.ItemsAdditionalStrings.RemoveRange(ItemAddStr);
-            }
-            _context.AdditionalStrings.RemoveRange(addStrs);
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task DeleteItems(Collection coll)
-        {
-            var items = _context.Item.Where(i => i.Collection == coll).ToList();
-            _context.Item.RemoveRange(items);
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task<bool> IsAllowed(Collection coll, OperationAuthorizationRequirement task)
-        {
-            var isAuthorized = await _authorizationService.AuthorizeAsync(User, coll, task);
-            return isAuthorized.Succeeded;
-        }
-
-        private void AttachItemAddithionalStrings()
-        {
-            var addStrs = _context.AdditionalStrings.Where(ad => ad.Collection == ColItems.Coll).ToList();
-            foreach (var addStr in addStrs)
-            {
-                if (addStr.TypeOfData == AdditionalStrings.TypesOfData.date || addStr.TypeOfData == AdditionalStrings.TypesOfData.title)
-                {
-                    ColItems.AddStr.Add(addStr);
-                    foreach (var item in ColItems.Items)
-                    {
-                        _context.ItemsAdditionalStrings.Where(i => i.Item == item).Where((i => i.AdditionalStrings == addStr)).FirstOrDefault();
-                    }
-                }
-            }
         }
     }
 }

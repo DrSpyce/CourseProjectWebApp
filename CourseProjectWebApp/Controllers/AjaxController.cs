@@ -58,6 +58,14 @@ namespace CourseProjectWebApp.Controllers
             return await _service.SetLike(itemId, userName);
         }
 
+        [HttpGet]
+        [Authorize]
+        [IgnoreAntiforgeryToken]
+        [Route("UnsetLike")]
+        public async Task<bool> UnsetLike(int? itemId, string userName)
+        {
+            return await _service.UnsetLike(itemId, userName);
+        }
 
         [HttpGet]
         [IgnoreAntiforgeryToken]
@@ -66,6 +74,14 @@ namespace CourseProjectWebApp.Controllers
         {
             var res = _service.SearchItem(str);
             return res;
+        }
+
+        [HttpGet]
+        [IgnoreAntiforgeryToken]
+        [Route("GetTag")]
+        public async Task<IActionResult> GetTagAsync(string term)
+        {
+            return new JsonResult(await _service.GetTag(term));
         }
     }
 }

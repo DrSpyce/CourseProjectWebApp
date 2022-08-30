@@ -1,23 +1,4 @@
-﻿function onSend() {
-    var form = document.getElementById('form');
-    var results = tagify.value;
-    if (results.length > 0) {
-        for (var i = 0; i < results.length; i++) {
-            $('<input>').attr({
-                type: 'hidden',
-                id: 'Item_Tags_' + i + '__Name',
-                name: 'Item.Tags[' + i + '].Name',
-                value: results[i].value
-            }).appendTo('#form');
-        }
-        form.submit();
-    }
-    else {
-        addAlert();
-    }
-}
-
-function addAlert() {
+﻿function addAlert() {
     if (!$('#tagAlert').length) {
         if ($('#model').length) {
             $('#model').remove();
@@ -37,8 +18,7 @@ function checkAlert() {
 }
 
 function addTags() {
-    var childs = $('#exTags').children();
-    $('#exTags').remove();
+    var childs = $('#allTags').find('span');
     if (childs.length == 0) {
         addAlert();
         return "";
@@ -50,3 +30,28 @@ function addTags() {
     }
     return tags;
 }
+
+function onChange() {
+    $('#allTags').empty();
+    var results = tagify.value;
+    if (results.length > 0) {
+        for (var i = 0; i < results.length; i++) {
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'Tags_' + i + '__Name',
+                name: 'Tags[' + i + '].Name',
+                value: results[i].value
+            }).appendTo('#allTags');
+        }
+    }
+    else {
+        addAlert();
+    }
+}
+
+var input = document.getElementById('tagName'),
+    tagify = new Tagify(input, { whitelist: [] });
+tagify.on('input', onInput);
+tagify.addTags([addTags()]);
+
+input.addEventListener('change', onChange);

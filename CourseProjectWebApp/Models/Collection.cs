@@ -1,13 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
 
 namespace CourseProjectWebApp.Models
 {
+    [Index(nameof(Title), IsUnique = true)]
     public class Collection
     {
         public int Id { get; set; }
 
         [Required]
+        [StringLength(50)]
         public string Title { get; set; }
 
         [Required]
@@ -16,7 +20,6 @@ namespace CourseProjectWebApp.Models
         [Required]
         public Topics Topic { get; set; }
 
-        [BindNever]
         public List<AdditionalStrings> AdditionalStrings { get; set; } = new();
           
         [BindNever]
