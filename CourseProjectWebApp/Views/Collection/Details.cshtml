@@ -4,7 +4,7 @@
 @using CourseProjectWebApp.Models
 @using static CourseProjectWebApp.Authorization.ProjectConstans
 @inject IAuthorizationService AuthorizationService
-
+@addTagHelper *, CourseProjectWebApp
 @model CourseProjectWebApp.Models.ViewModels.CollectionItemsViewModel
 
 @{
@@ -88,13 +88,13 @@ else
 		<table class="table text-center">
 			<thead>
 				<tr>
-					<th>ID</th>
-					<th>Title</th>
+					<th><a asp-action="details" asp-route-id="@Model.Coll.Id" asp-route-sortOrder="@ViewData["IdSortParm"]">ID</a></th>
+					<th><a asp-action="details" asp-route-id="@Model.Coll.Id" asp-route-sortOrder="@ViewData["TitleSortParm"]">Title</a></th>
 					@if(Model.AddStr != null)
 					{
 						foreach(var item in Model.AddStr)
 						{
-							<th>@item.Name</th>
+							<th><a asp-action="details" asp-route-id="@Model.Coll.Id" asp-route-addStrSort="@ViewData[@item.Name]">@item.Name</a></th>
 						}
 					}
 					<th>Actions</th>

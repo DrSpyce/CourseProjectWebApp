@@ -1,4 +1,5 @@
 ﻿using CourseProjectWebApp.Data;
+using System.Linq.Dynamic.Core;
 using CourseProjectWebApp.Interfaces;
 using CourseProjectWebApp.Models;
 using CourseProjectWebApp.Models.ViewModels;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using static CourseProjectWebApp.Authorization.ProjectConstans;
+using Microsoft.Data.SqlClient;
 
 namespace CourseProjectWebApp.Services
 {
@@ -36,12 +38,25 @@ namespace CourseProjectWebApp.Services
             return null;
         }
 
-        public async Task<CollectionItemsViewModel?> DetailsAsync(int id)
+        public async Task<CollectionItemsViewModel?> DetailsAsync(int id, string sortOrder)
         {
-            CollectionItemsViewModel CollItems = new();
-            CollItems.Coll = await _context.Collection.FirstAsync(c => c.Id == id);
-            CollItems.Items = _context.Item.Where(i => i.Collection == CollItems.Coll).ToList();
-            return AttachItemAddithionalStrings(CollItems);
+            CollectionItemsViewModel? collItems = new();
+            if (string.IsNullOrEmpty(sortOrder))
+            {
+                sortOrder = "Id";
+            }
+            return await CheckAndSet(collItems, id, sortOrder);
+        }
+
+        private async Task<CollectionItemsViewModel?> CheckAndSet(CollectionItemsViewModel collItems, int id, string sortOrder)
+        {
+            collItems.Coll = await _context.Collection.FirstOrDefaultAsync(c => c.Id == id);
+            if(collItems.Coll == null)
+            {
+                return null;
+            }
+            collItems.Items = _context.Item.Where(i => i.Collection == collItems.Coll).OrderBy(sortOrder).ToList();
+            return AttachItemAddithionalStrings(collItems);
         }
 
         public async Task EditAsync(int id, Collection coll)
@@ -71,6 +86,21 @@ namespace CourseProjectWebApp.Services
             await _context.Collection.AddAsync(coll);
             _context.SaveChanges();
             return $"{coll.Title} created";
+        }
+
+        public List<Item> SortNested(List<Item> items, string addStrSort)
+        {
+            bool descending = false;
+            if (addStrSort.EndsWith("_desc"))
+            {
+                addStrSort = addStrSort.Substring(0, addStrSort.Length - 5);
+                descending = true;
+            }
+            if (descending)
+            {
+                return items.OrderBy(i => i.ItemsAdditionalStrings.Find(ia => ia.AdditionalStrings.Name == addStrSort).Data).Reverse().ToList();
+            }
+            return items.OrderBy(i => i.ItemsAdditionalStrings.Find(ia => ia.AdditionalStrings.Name == addStrSort).Data).ToList();
         }
 
         private CollectionItemsViewModel AttachItemAddithionalStrings(CollectionItemsViewModel CollItems)

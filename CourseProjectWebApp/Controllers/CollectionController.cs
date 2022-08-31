@@ -1,4 +1,5 @@
-﻿using CourseProjectWebApp.Data;
+﻿
+using CourseProjectWebApp.Data;
 using CourseProjectWebApp.Interfaces;
 using CourseProjectWebApp.Models;
 using CourseProjectWebApp.Models.ViewModels;
@@ -45,12 +46,22 @@ namespace CourseProjectWebApp.Controllers
         }
 
         [Route("Collection/{id:int}")]
-        public async Task<ActionResult> DetailsAsync(int id)
+        public async Task<ActionResult> DetailsAsync(int id, string sortOrder, string addStrSort)
         {
-            var result = await _collectionService.DetailsAsync(id);
+            ViewData["IdSortParm"] = String.IsNullOrEmpty(sortOrder) ? "Id desc" : "";
+            ViewData["TitleSortParm"] = sortOrder == "Title" ? "Title desc" : "Title";
+            var result = await _collectionService.DetailsAsync(id, sortOrder);
             if (result == null)
             {
                 return NotFound();
+            }
+            foreach (var addStr in result.AddStr)
+            {
+                ViewData[addStr.Name!] = addStrSort == addStr.Name ? addStr.Name + "_desc" : addStr.Name;
+            }
+            if (!string.IsNullOrEmpty(addStrSort))
+            {
+                result.Items = _collectionService.SortNested(result.Items, addStrSort);
             }
             return View(result);
         }
@@ -78,13 +89,13 @@ namespace CourseProjectWebApp.Controllers
         public async Task<ActionResult> CreateAsync(Collection coll)
         {
             var check = await _context.Collection.FirstOrDefaultAsync(c => c.Title == coll.Title);
-            if(check is not null)
+            if (check is not null)
             {
                 ModelState.AddModelError("Title", "Collection with that name already exist");
             }
             if (!ModelState.IsValid)
-            { 
-                return View(coll); 
+            {
+                return View(coll);
             }
             Message = await _collectionService.CreateCollection(coll, User);
             return RedirectToAction(nameof(Mine));
