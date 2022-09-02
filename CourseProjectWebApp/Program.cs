@@ -8,9 +8,14 @@ using CourseProjectWebApp.Authorization;
 using CourseProjectWebApp.Hubs;
 using CourseProjectWebApp.Interfaces;
 using CourseProjectWebApp.Services;
+using Amazon.S3;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("CourseProjectWebAppContextConnection") ?? throw new InvalidOperationException("Connection string 'CourseProjectWebAppContextConnection' not found.");
+
+InitializeAWS.SetCredentials(builder.Configuration);
+InitializeAWS.SetRegion(Amazon.RegionEndpoint.EUCentral1);
+
 
 builder.Services.AddDbContext<CourseProjectWebAppContext>(options =>
     options.UseSqlServer(connectionString));
@@ -49,6 +54,9 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<IAjaxService, AjaxService>();
 builder.Services.AddScoped<ICollectionService, CollectionService>();
 builder.Services.AddScoped<IItemService, ItemService>();
+
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+builder.Services.AddAWSService<IAmazonS3>();
 
 var app = builder.Build();
 

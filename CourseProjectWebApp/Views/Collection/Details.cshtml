@@ -11,14 +11,15 @@
 	ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
 @{
 	var result = Markdown.ToHtml(Model.Coll.Description);
 }
 <div>
-	<h4>Collection: @Html.DisplayFor(model => model.Coll.Title)</h4>
-	<div class="">
-		<dl class="row">
+	
+	<div class="row">
+		<dl class="col-md-6">
+			<h1>Details</h1>
+			<h4>Collection: @Html.DisplayFor(model => model.Coll.Title)</h4>
 			<dt class="col-sm-2">
 				@Html.DisplayNameFor(model => model.Coll.Topic)
 			</dt>
@@ -32,9 +33,15 @@
 				@Html.Raw(result)
 			</dd>
 		</dl>
+		<div class="col-md-6">
+			@if(Model.Coll.ImageUrl != null)
+			{
+				<img src="@Model.Coll.ImageUrl" style="max-width:350px;max-height:350px"/>
+			}
+		</div>
 	</div>
 	<div>
-		<div class="hstack gap-3 mb-2">
+		<div class="hstack gap-3 mb-2 mt-1">
 			@if ((await AuthorizationService.AuthorizeAsync(User, Model.Coll, CollectionOperations.Update)).Succeeded)
 			{
 				<a class="btn btn-primary px-4" asp-action="Edit" asp-route-id="@Model.Coll.Id">Edit</a>

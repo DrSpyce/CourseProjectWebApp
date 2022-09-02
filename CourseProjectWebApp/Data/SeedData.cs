@@ -14,7 +14,6 @@ namespace CourseProjectWebApp.Data
             {
                 var userID = await EnsureUser(serviceProvider, UserPw, userName, email);
                 await EnsureRole(serviceProvider, userID, role);
-
             }
         }
 

@@ -19,6 +19,9 @@ namespace CourseProjectWebApp.Models
 
         [Required]
         public Topics Topic { get; set; }
+        
+        [Url]
+        public string? ImageUrl { get; set; }
 
         public List<AdditionalStrings> AdditionalStrings { get; set; } = new();
           

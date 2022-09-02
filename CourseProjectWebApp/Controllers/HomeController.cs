@@ -1,4 +1,6 @@
-﻿using CourseProjectWebApp.Data;
+﻿using Amazon.S3.Model;
+using Amazon.S3;
+using CourseProjectWebApp.Data;
 using CourseProjectWebApp.Models;
 using CourseProjectWebApp.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;

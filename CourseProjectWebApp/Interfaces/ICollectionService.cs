@@ -18,7 +18,7 @@ namespace CourseProjectWebApp.Interfaces
 
         public Task<string> DeleteAsync(int id);
 
-        public Task<string> CreateCollection(Collection coll, ClaimsPrincipal user);
+        public Task<string> CreateCollection(Collection coll, ClaimsPrincipal user, IFormFile uploadedFile);
 
         public List<Item> SortNested(List<Item> items, string addStrSort);
 

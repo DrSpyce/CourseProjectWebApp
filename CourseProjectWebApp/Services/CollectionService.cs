@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using static CourseProjectWebApp.Authorization.ProjectConstans;
 using Microsoft.Data.SqlClient;
+using Amazon.S3.Model;
+using Amazon.S3;
 
 namespace CourseProjectWebApp.Services
 {
@@ -19,12 +21,17 @@ namespace CourseProjectWebApp.Services
         private readonly CourseProjectWebAppContext _context;
         private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAmazonS3 _s3Client;
 
-        public CollectionService(UserManager<ApplicationUser> userManager, CourseProjectWebAppContext context, IAuthorizationService authorizationService)
+        const string Bucket = "testbucketspycee";
+
+        public CollectionService(UserManager<ApplicationUser> userManager, CourseProjectWebAppContext context, 
+            IAuthorizationService authorizationService, IAmazonS3 s3Client)
         {
             _userManager = userManager;
             _context = context;
             _authorizationService = authorizationService;
+            _s3Client = s3Client;
         }
 
         public async Task<List<Collection>?> Mine(string userName)
@@ -80,8 +87,12 @@ namespace CourseProjectWebApp.Services
             return collTitle;
         }
 
-        public async Task<string> CreateCollection(Collection coll, ClaimsPrincipal user)
+        public async Task<string> CreateCollection(Collection coll, ClaimsPrincipal user, IFormFile uploadedFile)
         {
+            if(uploadedFile != null)
+            {
+                coll.ImageUrl = await UploadImage(uploadedFile);
+            }
             coll.ApplicationUser = await _userManager.FindByNameAsync(user!.Identity!.Name);
             await _context.Collection.AddAsync(coll);
             _context.SaveChanges();
@@ -140,6 +151,21 @@ namespace CourseProjectWebApp.Services
         {
             var isAuthorized = await _authorizationService.AuthorizeAsync(user, coll, task);
             return isAuthorized.Succeeded;
+        }
+
+        private async Task<string> UploadImage(IFormFile uploadedFile)
+        {
+            var bucketExists = await _s3Client.DoesS3BucketExistAsync(Bucket);
+            if (!bucketExists) return ("Error occured");
+            string fileName = Guid.NewGuid().ToString();
+            var request = new PutObjectRequest()
+            {
+                BucketName = Bucket,
+                Key = fileName,
+                InputStream = uploadedFile.OpenReadStream()
+            };
+            await _s3Client.PutObjectAsync(request);
+            return $"https://{Bucket}.s3.eu-central-1.amazonaws.com/{fileName}";
         }
     }
 }
