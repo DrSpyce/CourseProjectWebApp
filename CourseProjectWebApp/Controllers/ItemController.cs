@@ -83,7 +83,7 @@ namespace CourseProjectWebApp.Controllers
                 return RedirectToRoute(new { controller = "Collection", action = "Details", id });
             }
             ViewBag.Collection = await _itemService.SetAdditionalDataForCreate(id);
-            return View(itemTags.Item);
+            return View(itemTags);
         }
 
         [Authorize]

@@ -48,7 +48,7 @@
                             <textarea class="form-control" asp-for="Item.ItemsAdditionalStrings[i].Data"></textarea>
                             break;
                         case AdditionalStrings.TypesOfData.boolean:
-                            <input type="radio" asp-for="Item.ItemsAdditionalStrings[i].Data" value="@ViewBag.Collection.AdditionalStrings[i].Name" />
+                            <input class="form-check-input" type="checkbox" asp-for="Item.ItemsAdditionalStrings[i].Data" value="@ViewBag.Collection.AdditionalStrings[i].Name" />
                             break;
                         case AdditionalStrings.TypesOfData.date:
                             <input class="form-control" type="date" asp-for="Item.ItemsAdditionalStrings[i].Data" />

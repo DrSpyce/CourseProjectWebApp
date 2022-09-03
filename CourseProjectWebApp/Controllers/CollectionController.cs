@@ -86,7 +86,7 @@ namespace CourseProjectWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<ActionResult> CreateAsync(Collection coll, IFormFile uploadedFile)
+        public async Task<ActionResult> CreateAsync(Collection coll, IFormFile? uploadedFile)
         {
             var check = await _context.Collection.FirstOrDefaultAsync(c => c.Title == coll.Title);
             if (check is not null)
