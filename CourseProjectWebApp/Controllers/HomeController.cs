@@ -1,11 +1,10 @@
-﻿using Amazon.S3.Model;
-using Amazon.S3;
-using CourseProjectWebApp.Data;
-using CourseProjectWebApp.Models;
+﻿using CourseProjectWebApp.Data;
 using CourseProjectWebApp.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using CourseProjectWebApp.Interfaces;
+using static CourseProjectWebApp.Interfaces.IAjaxService;
+using System.Text.Json;
 
 namespace CourseProjectWebApp.Controllers
 {
@@ -13,11 +12,14 @@ namespace CourseProjectWebApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly CourseProjectWebAppContext _context;
+        private readonly IAjaxService _ajaxService;
 
-        public HomeController(ILogger<HomeController> logger, CourseProjectWebAppContext context)
+        public HomeController(ILogger<HomeController> logger, 
+            CourseProjectWebAppContext context, IAjaxService ajaxService)
         {
             _logger = logger;
             _context = context;
+            _ajaxService = ajaxService;
         }
 
         public IActionResult Index()
@@ -61,6 +63,13 @@ namespace CourseProjectWebApp.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult Search(string search)
+        {
+            var result = _ajaxService.SearchItem(search, 30);
+            //var res = JsonSerializer.Deserialize<List<SearchResultViewModel>>(result);
+            return View((List<SearchResultViewModel>)result.Value);
         }
     }
 }

@@ -10,7 +10,7 @@
 
 <form asp-action="edit" asp-controller="collection" asp-route-id="@Model.Id" method="post">
 	<div class="row d-flex justify-content-center">
-		<div class="col-md-4 ">
+		<div class="col-lg-6 ">
 			<div asp-validation-summary="All" class="text-danger"></div>
 			<input type="hidden" asp-for="Id" />
 			<input type="hidden" asp-for="ApplicationUserId" />
@@ -20,14 +20,15 @@
 				<span asp-validation-for="Title" class="text-danger"></span>
 			</div>
 			<div class="form-group">
-				<label asp-for="Description" class="control-label"></label>
-				<input asp-for="Description" class="form-control" />
-				<span asp-validation-for="Description" class="text-danger"></span>
-			</div>
-			<div class="form-group">
 				<label asp-for="Topic" class="control-label"></label>
 				<select asp-for="Topic" class="form-control" asp-items="Html.GetEnumSelectList<Collection.Topics>()"></select>
 				<span asp-validation-for="Topic" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label asp-for="Description" class="control-label"></label>
+				<input id="markdownInput" />
+				<input asp-for="Description" class="form-control visually-hidden" id="descInput"/>
+				<span asp-validation-for="Description" class="text-danger"></span>
 			</div>
 		</div>
 	</div>
@@ -61,4 +62,14 @@
 	@{
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
+	 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <script>
+        var simplemde = new SimpleMDE({ element: document.getElementById("markdownInput") });
+        simplemde.codemirror.on('change', function () {
+            $('#descInput').val(simplemde.value());
+        });
+		$(document).ready(function () {
+			simplemde.value($('#descInput').val());
+		});
+    </script>
 	}

@@ -27,8 +27,9 @@
                     <span asp-validation-for="Topic" class="text-danger"></span>
                 </div>
                 <div class="form-group mb-4">
-                    <label asp-for="Description" class="control-label">Description (You can write Markdown here)</label>
-                    <input asp-for="Description" class="form-control" />
+                    <label asp-for="Description" class="control-label">Description</label>
+                    <input id="markdownInput" />
+                    <input asp-for="Description" class="form-control visually-hidden" id="descInput" />
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
             </div>
@@ -118,11 +119,16 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/collectionCreate.js"></script>
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
     <script>
         $('#addImage').on('click', function(e){
             e.preventDefault;
             $('#imageBlock').removeClass('visually-hidden');
             $('#addImage').remove();
+        });
+        var simplemde = new SimpleMDE({ element: document.getElementById("markdownInput") });
+        simplemde.codemirror.on('change', function () {
+            $('#descInput').val(simplemde.value());
         });
     </script>
 	}

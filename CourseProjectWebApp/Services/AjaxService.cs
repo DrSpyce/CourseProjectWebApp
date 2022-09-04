@@ -10,7 +10,7 @@ using static CourseProjectWebApp.Interfaces.IAjaxService;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
-using static CourseProjectWebApp.Interfaces.IAjaxService.SearchResult;
+using CourseProjectWebApp.Models.ViewModels;
 
 namespace CourseProjectWebApp.Services
 {
@@ -151,7 +151,7 @@ namespace CourseProjectWebApp.Services
             await _hubContext.Clients.Group($"group{itemId}").SendAsync("decrement");
         }
 
-        private List<SearchResult> SearchItems(string str, int numberOfResults)
+        private List<SearchResultViewModel> SearchItems(string str, int numberOfResults)
         {
             var res = _context.Item
                .Include(i => i.Collection)
@@ -167,15 +167,15 @@ namespace CourseProjectWebApp.Services
                    CollectionId = i.CollectionId,
                    type = "item"
                });
-            List<SearchResult> searchResult = new();
+            List<SearchResultViewModel> searchResult = new();
             foreach (var item in res)
             {
-                searchResult.Add(new SearchResult { Title = item.Title, CollectionId = item.CollectionId, Id = item.Id, TypeOfResult = TypeOfResults.Item });
+                searchResult.Add(new SearchResultViewModel { Title = item.Title, CollectionId = item.CollectionId, Id = item.Id, TypeOfResult = SearchResultViewModel.TypeOfResults.Item });
             }
             return searchResult;
         }
 
-        private List<SearchResult> SearchCollections(string str, int numberOfResults, List<SearchResult> result)
+        private List<SearchResultViewModel> SearchCollections(string str, int numberOfResults, List<SearchResultViewModel> result)
         {
             var col = _context.Collection.Include(c => c.AdditionalStrings)
                     .Where(c => c.Description.Contains(str) || c.Title.Contains(str) || c.AdditionalStrings.Any(a => a.Name.Contains(str)))
@@ -188,7 +188,7 @@ namespace CourseProjectWebApp.Services
                     });
             foreach (var item in col)
             {
-                result.Add(new SearchResult { Title = item.Title, Id = item.Id, TypeOfResult = TypeOfResults.Collection});
+                result.Add(new SearchResultViewModel { Title = item.Title, Id = item.Id, TypeOfResult = SearchResultViewModel.TypeOfResults.Collection});
             }
             return result;
         }

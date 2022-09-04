@@ -1,5 +1,6 @@
 ﻿using CourseProjectWebApp.Models;
 using CourseProjectWebApp.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CourseProjectWebApp.Interfaces
 {
@@ -13,7 +14,7 @@ namespace CourseProjectWebApp.Interfaces
 
         public Task UpdateItem(ItemTagsViewModel itemTags);
 
-        public Task<bool> DeleteConfirmed(int itemId);
+        public Task<string> DeleteConfirmed(int itemId);
 
         public Task<Collection?> SetAdditionalDataForCreate(int? id);
     }

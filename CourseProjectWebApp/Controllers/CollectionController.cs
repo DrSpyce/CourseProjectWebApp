@@ -46,7 +46,7 @@ namespace CourseProjectWebApp.Controllers
         }
 
         [Route("Collection/{id:int}")]
-        public async Task<ActionResult> DetailsAsync(int id, string sortOrder, string addStrSort)
+        public async Task<ActionResult> DetailsAsync(int id, string sortOrder, string addStrSort, string? message)
         {
             ViewData["IdSortParm"] = String.IsNullOrEmpty(sortOrder) ? "Id desc" : "";
             ViewData["TitleSortParm"] = sortOrder == "Title" ? "Title desc" : "Title";
@@ -62,6 +62,10 @@ namespace CourseProjectWebApp.Controllers
             if (!string.IsNullOrEmpty(addStrSort))
             {
                 result.Items = _collectionService.SortNested(result.Items, addStrSort);
+            }
+            if (!string.IsNullOrEmpty(message))
+            {
+                ViewData["Message"] = message;
             }
             return View(result);
         }
@@ -135,7 +139,7 @@ namespace CourseProjectWebApp.Controllers
             {
                 await _collectionService.EditAsync(id, coll);
                 Message = $"{coll.Title} edited";
-                return RedirectToAction(nameof(Mine));
+                return RedirectToAction(nameof(DetailsAsync), id);
             }
             return View(coll);
         }

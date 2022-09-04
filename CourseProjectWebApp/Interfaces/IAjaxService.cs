@@ -16,22 +16,5 @@ namespace CourseProjectWebApp.Interfaces
         public JsonResult SearchItem(string str, int numberOfResults = 5);
 
         public Task<List<string>> GetTag(string term);
-
-        public class SearchResult
-        {
-            public string Title { get; set; }
-
-            public int Id { get; set; }
-
-            public int? CollectionId { get; set; }
-
-            public TypeOfResults TypeOfResult { get; set; }
-            
-            public enum TypeOfResults
-            {
-                Collection,
-                Item
-            }
-        }
     }
 }

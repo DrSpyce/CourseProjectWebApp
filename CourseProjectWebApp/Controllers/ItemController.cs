@@ -80,7 +80,8 @@ namespace CourseProjectWebApp.Controllers
                     return Forbid();
                 }
                 await _itemService.CreateItem(itemTags);
-                return RedirectToRoute(new { controller = "Collection", action = "Details", id });
+                string message = $"{itemTags.Item.Title} created";
+                return RedirectToRoute(new { controller = "Collection", action = "Details", id, message });
             }
             ViewBag.Collection = await _itemService.SetAdditionalDataForCreate(id);
             return View(itemTags);
@@ -120,7 +121,8 @@ namespace CourseProjectWebApp.Controllers
             if (ModelState.IsValid)
             {
                 await _itemService.UpdateItem(itemTags);
-                return RedirectToRoute(new { controller = "Collection", action = "Details", id });
+                string message = $"{itemTags.Item.Title} updated";
+                return RedirectToRoute(new { controller = "Collection", action = "Details", id, message});
             }
             ViewBag.Collection = await _itemService.SetAdditionalDataForCreate(id);
             return View(itemTags);
@@ -136,11 +138,13 @@ namespace CourseProjectWebApp.Controllers
             {
                 return Forbid();
             }
-            if(!await _itemService.DeleteConfirmed(itemId))
+            var result = await _itemService.DeleteConfirmed(itemId);
+            if (result == "not found")
             {
                 return NotFound();
             }
-            return RedirectToRoute(new { controller = "Collection", action = "Details", id });
+            string message = $"{result} deleted";
+            return RedirectToRoute(new { controller = "Collection", action = "Details", id, message });
         }
     }
 }

@@ -68,7 +68,7 @@ namespace CourseProjectWebApp.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteConfirmed(int itemId)
+        public async Task<string> DeleteConfirmed(int itemId)
         {
             var item = await _context.Item.FirstOrDefaultAsync(i => i.Id == itemId);
             if (item != null)
@@ -76,9 +76,9 @@ namespace CourseProjectWebApp.Services
                 DeleteConnected(item);
                 _context.Item.Remove(item);
                 await _context.SaveChangesAsync();
-                return true;
+                return item.Title;
             }
-            return false;
+            return "not found";
         }
 
         private void DeleteConnected(Item item)
