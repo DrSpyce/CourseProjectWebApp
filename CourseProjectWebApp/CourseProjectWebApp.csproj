@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Resources\Views\Admin\" />
     <Folder Include="wwwroot\lib\tag-cloud\dist\" />
   </ItemGroup>
 

@@ -13,6 +13,8 @@ using static CourseProjectWebApp.Authorization.ProjectConstans;
 using Microsoft.Data.SqlClient;
 using Amazon.S3.Model;
 using Amazon.S3;
+using CourseProjectWebApp.Controllers;
+using Microsoft.Extensions.Localization;
 
 namespace CourseProjectWebApp.Services
 {
@@ -22,16 +24,19 @@ namespace CourseProjectWebApp.Services
         private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAmazonS3 _s3Client;
+        private readonly IStringLocalizer<CollectionService> _localizer;
 
         const string Bucket = "testbucketspycee";
 
         public CollectionService(UserManager<ApplicationUser> userManager, CourseProjectWebAppContext context, 
-            IAuthorizationService authorizationService, IAmazonS3 s3Client)
+            IAuthorizationService authorizationService, IAmazonS3 s3Client,
+            IStringLocalizer<CollectionService> localizer)
         {
             _userManager = userManager;
             _context = context;
             _authorizationService = authorizationService;
             _s3Client = s3Client;
+            _localizer = localizer;
         }
 
         public async Task<List<Collection>?> Mine(string userName)
@@ -96,7 +101,7 @@ namespace CourseProjectWebApp.Services
             coll.ApplicationUser = await _userManager.FindByNameAsync(user!.Identity!.Name);
             await _context.Collection.AddAsync(coll);
             _context.SaveChanges();
-            return $"{coll.Title} created";
+            return $"{coll.Title} {_localizer["created"]}!";
         }
 
         public List<Item> SortNested(List<Item> items, string addStrSort)

@@ -1,15 +1,17 @@
-﻿@model List<SearchResultViewModel>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model List<SearchResultViewModel>
 
 @{
-    ViewData["Title"] = "Search";
+    ViewData["Title"] = Localizer["Title"];
 }
-
+@Localizer["Title"]
 <div class="row justify-content-center text-center">
     <div class="col-lg-4">
         <form asp-action="search" asp-controller="home">
-            <label for="inputSearch" class="form-label">New search</label>
+            <label for="inputSearch" class="form-label">@Localizer["New search"]</label>
             <input type="text" id="inputSearch" class="form-control" name="search" />
-            <input type="submit" value="Search" class="btn btn-primary mt-1"/>
+            <input type="submit" value="@Localizer["Search"]" class="btn btn-primary mt-1"/>
         </form>
     </div>
 </div>
@@ -17,17 +19,17 @@
 @if (Model.Count > 0)
 {
     <div class="row justify-content-center text-center">
-        <h1 class="fs-3">Found @Model.Count results</h1>
+        <h1 class="fs-3">@Localizer["Found"] @Model.Count @Localizer["results"]</h1>
         <div class="list-group col-lg-6 gap-2">
             @foreach (var result in Model)
             {
                 @if (result.TypeOfResult == SearchResultViewModel.TypeOfResults.Item)
                 {
-                    <a class="list-group-item list-group-item-actio" asp-action="details" asp-controller="item" asp-route-id="@result.CollectionId" asp-route-itemId="@result.Id">Item: @result.Title</a>
+                    <a class="list-group-item list-group-item-actio" asp-action="details" asp-controller="item" asp-route-id="@result.CollectionId" asp-route-itemId="@result.Id">@Localizer["Item"]: @result.Title</a>
                 }
                 @if (result.TypeOfResult == SearchResultViewModel.TypeOfResults.Collection)
                 {
-                    <a class="list-group-item list-group-item-actio" asp-action="details" asp-controller="collection" asp-route-id="@result.CollectionId">Collection: @result.Title</a>
+                    <a class="list-group-item list-group-item-actio" asp-action="details" asp-controller="collection" asp-route-id="@result.CollectionId">@Localizer["Collection"]: @result.Title</a>
                 }
             }
         </div>

@@ -1,23 +1,25 @@
 ﻿@model List<CourseProjectWebApp.Models.Collection>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
-	ViewData["Title"] = "Index";
+	ViewData["Title"] = Localizer["Title"];
 }
 
 @if (Model.Count == 0)
 {
-	<h1 class="fs-3">No collections created yet</h1>
+	<h1 class="fs-3">@Localizer["No collections"]</h1>
 }
 else
 {
-	<h1 class="fs-4">Here is list of all Collections:</h1>
+	<h1 class="fs-4">@Localizer["List of collection"]:</h1>
 	<div class="list-group">
 		@foreach (var item in Model)
 		{
 			<a asp-action="Details" asp-route-id="@item.Id" class="list-group-item list-group-item-action" aria-current="true">
 				<div class="ms-2 me-auto">
 					<div class="fw-bold fs-3">@item.Title</div>
-					Topic: @item.Topic
+					@Localizer["Topic"]: @item.Topic
 				</div>
 			</a>
 		}

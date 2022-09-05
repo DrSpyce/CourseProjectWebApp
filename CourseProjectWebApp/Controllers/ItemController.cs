@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using CourseProjectWebApp.Hubs;
 using CourseProjectWebApp.Interfaces;
+using Microsoft.Extensions.Localization;
 
 namespace CourseProjectWebApp.Controllers
 {
@@ -22,13 +23,15 @@ namespace CourseProjectWebApp.Controllers
         private readonly CourseProjectWebAppContext _context;
         private readonly IItemService _itemService;
         private readonly ICollectionService _collectionService;
+        private readonly IStringLocalizer<ItemController> _localizer;
 
         public ItemController(CourseProjectWebAppContext context,
-            IItemService itemService, ICollectionService collectionService)
-        {
+            IItemService itemService, ICollectionService collectionService, IStringLocalizer<ItemController> localizer)
+        { 
             _context = context;
             _itemService = itemService;
             _collectionService = collectionService;
+            _localizer = localizer;
         }
 
         [Route("Collection/{id:int}/Item/{itemId:int}")]
@@ -80,7 +83,7 @@ namespace CourseProjectWebApp.Controllers
                     return Forbid();
                 }
                 await _itemService.CreateItem(itemTags);
-                string message = $"{itemTags.Item.Title} created";
+                string message = $"{itemTags.Item.Title} {_localizer["created"]}!";
                 return RedirectToRoute(new { controller = "Collection", action = "Details", id, message });
             }
             ViewBag.Collection = await _itemService.SetAdditionalDataForCreate(id);
@@ -121,7 +124,7 @@ namespace CourseProjectWebApp.Controllers
             if (ModelState.IsValid)
             {
                 await _itemService.UpdateItem(itemTags);
-                string message = $"{itemTags.Item.Title} updated";
+                string message = $"{itemTags.Item.Title} {_localizer["updated"]}!";
                 return RedirectToRoute(new { controller = "Collection", action = "Details", id, message});
             }
             ViewBag.Collection = await _itemService.SetAdditionalDataForCreate(id);
@@ -143,7 +146,7 @@ namespace CourseProjectWebApp.Controllers
             {
                 return NotFound();
             }
-            string message = $"{result} deleted";
+            string message = $"{result} {_localizer["deleted"]}!";
             return RedirectToRoute(new { controller = "Collection", action = "Details", id, message });
         }
     }

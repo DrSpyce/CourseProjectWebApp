@@ -11,6 +11,7 @@ using static CourseProjectWebApp.Authorization.ProjectConstans;
 using CourseProjectWebApp.Models;
 using CourseProjectWebApp.Data;
 using CourseProjectWebApp.Models.ViewModels;
+using Microsoft.Extensions.Localization;
 
 namespace CourseProjectWebApp.Controllers
 {
@@ -21,6 +22,7 @@ namespace CourseProjectWebApp.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly CourseProjectWebAppContext _context;
+        private readonly IStringLocalizer<AdminController> _localizer;
 
         [BindProperty]
         public List<string> AreChecked { get; set; }
@@ -36,12 +38,16 @@ namespace CourseProjectWebApp.Controllers
 
         private bool LogOut = false;
 
-        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, CourseProjectWebAppContext context)
+        public AdminController(UserManager<ApplicationUser> userManager, 
+            RoleManager<IdentityRole> roleManager, 
+            SignInManager<ApplicationUser> signInManager, 
+            CourseProjectWebAppContext context, IStringLocalizer<AdminController> localizer)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
             _context = context;
+            _localizer = localizer;
         }
 
         public async Task<IActionResult> Index()
@@ -82,7 +88,7 @@ namespace CourseProjectWebApp.Controllers
                 Results.Add(await DeleteUser(user));
             }
             await CheckIfLogOut();
-            SetMessage("deleted");
+            SetMessage(_localizer["deleted"]);
             return RedirectToAction("Index", "Admin");
         }
 
@@ -110,7 +116,7 @@ namespace CourseProjectWebApp.Controllers
                 }
             }
             await CheckIfLogOut();
-            SetMessage("blocked");
+            SetMessage(_localizer["blocked"]);
             return RedirectToAction("Index", "Admin");
         }
 
@@ -129,7 +135,7 @@ namespace CourseProjectWebApp.Controllers
                     Results.Add(await _userManager.UpdateAsync(user));
                 }
             }
-            SetMessage("unblocked");
+            SetMessage(_localizer["unblocked"]);
             return RedirectToAction("Index", "Admin");
         }
 
@@ -146,7 +152,7 @@ namespace CourseProjectWebApp.Controllers
                     await _userManager.RemoveFromRoleAsync(user, Constants.UserRole);
                 };
             }
-            SetMessage("now Admin(s)");
+            SetMessage(_localizer["now admin"]);
             return RedirectToAction("Index", "Admin");
         }
 
@@ -164,7 +170,7 @@ namespace CourseProjectWebApp.Controllers
                 };
             }
             await CheckIfLogOut();
-            SetMessage("now not Admin(s)");
+            SetMessage(_localizer["not admin"]);
             return RedirectToAction("Index", "Admin");
         }
 
@@ -195,7 +201,7 @@ namespace CourseProjectWebApp.Controllers
 
         private void SetMessage(string nameOfAction)
         {
-            Message = $"{Results.Count} user(s) {nameOfAction}!";
+            Message = $"{Results.Count} {_localizer["users"]} {nameOfAction}!";
         }
     }
 }

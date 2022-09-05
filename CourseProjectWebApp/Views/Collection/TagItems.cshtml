@@ -2,12 +2,14 @@
 @using Microsoft.AspNetCore.Authorization
 @using static CourseProjectWebApp.Authorization.ProjectConstans
 @model CourseProjectWebApp.Models.Tag
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Mine";
+    ViewData["Title"] = Localizer["Title"];
 }
 
-<h1 class="fs-3">Tag: @Model.Name</h1>
+<h1 class="fs-3">@Localizer["Tag"]: @Model.Name</h1>
 @if(Model.Items.Count > 0)
 {
     <div class="list-group">
@@ -15,9 +17,9 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Title</th>
-                    <th>Collection title</th>
-                    <th>Actions</th>
+                    <th>@Localizer["Tag title"]</th>
+                    <th>@Localizer["Collection title"]</th>
+                    <th>@Localizer["Actions"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -29,7 +31,7 @@
                         <td>@item.Collection!.Title</td>
                         <td>
                             <div class="d-flex justify-content-center">
-                                <a asp-controller="item" asp-action="Details" asp-route-id="@item.Collection.Id" asp-route-itemId="@item.Id" class="btn btn-primary">Show</a>
+                                <a asp-controller="item" asp-action="Details" asp-route-id="@item.Collection.Id" asp-route-itemId="@item.Id" class="btn btn-primary">@Localizer["Show"]</a>
                             </div>
                         </td>
                     </tr>
@@ -40,5 +42,5 @@
 }
 else
 {
-    <p>This Tag don't have items!</p>
+    <p>@Localizer["No items"]!</p>
 }

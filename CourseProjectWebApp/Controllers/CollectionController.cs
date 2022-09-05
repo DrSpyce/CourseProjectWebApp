@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using static CourseProjectWebApp.Authorization.ProjectConstans;
 
 namespace CourseProjectWebApp.Controllers
@@ -16,11 +18,14 @@ namespace CourseProjectWebApp.Controllers
     {
         private readonly ICollectionService _collectionService;
         private readonly CourseProjectWebAppContext _context;
+        private readonly IStringLocalizer<CollectionController> _localizer;
 
-        public CollectionController(CourseProjectWebAppContext context, ICollectionService collectionService)
+        public CollectionController(CourseProjectWebAppContext context, 
+            ICollectionService collectionService, IStringLocalizer<CollectionController> localizer)
         {
             _context = context;
             _collectionService = collectionService;
+            _localizer = localizer;
         }
 
         [TempData]
@@ -46,7 +51,7 @@ namespace CourseProjectWebApp.Controllers
         }
 
         [Route("Collection/{id:int}")]
-        public async Task<ActionResult> DetailsAsync(int id, string sortOrder, string addStrSort, string? message)
+        public async Task<ActionResult> DetailsAsync(int id, string sortOrder, string addStrSort, string message)
         {
             ViewData["IdSortParm"] = String.IsNullOrEmpty(sortOrder) ? "Id desc" : "";
             ViewData["TitleSortParm"] = sortOrder == "Title" ? "Title desc" : "Title";
@@ -65,7 +70,11 @@ namespace CourseProjectWebApp.Controllers
             }
             if (!string.IsNullOrEmpty(message))
             {
-                ViewData["Message"] = message;
+                Message = message;
+            }
+            if (!string.IsNullOrEmpty(Message))
+            {
+                ViewData["Message"] = Message;
             }
             return View(result);
         }
@@ -95,7 +104,7 @@ namespace CourseProjectWebApp.Controllers
             var check = await _context.Collection.FirstOrDefaultAsync(c => c.Title == coll.Title);
             if (check is not null)
             {
-                ModelState.AddModelError("Title", "Collection with that name already exist");
+                ModelState.AddModelError("Title", _localizer["Collection exist"]);
             }
             if (!ModelState.IsValid)
             {
@@ -138,8 +147,8 @@ namespace CourseProjectWebApp.Controllers
             if (ModelState.IsValid)
             {
                 await _collectionService.EditAsync(id, coll);
-                Message = $"{coll.Title} edited";
-                return RedirectToAction(nameof(DetailsAsync), id);
+                Message = $"{coll.Title} {_localizer["edited"]}!";
+                return RedirectToAction("Details", new { id });
             }
             return View(coll);
         }
@@ -153,7 +162,7 @@ namespace CourseProjectWebApp.Controllers
                 return Forbid();
             }
             string collTitle = await _collectionService.DeleteAsync(id);
-            Message = $"{collTitle} deleted";
+            Message = $"{collTitle} {_localizer["deleted"]}!";
             return RedirectToAction(nameof(Mine));
         }
     }

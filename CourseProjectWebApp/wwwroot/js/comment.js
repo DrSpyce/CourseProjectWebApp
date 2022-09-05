@@ -6,7 +6,7 @@ $('#submit').click(function (event) {
     event.preventDefault();
     var text = $('#commentText').val();
     if (text == '') {
-        $('#commentTextValidation').text("Comment can't be empty");
+        $('#commentTextValidation').text(commentEmpty);
     }
     else {
         $('#commentText').val('');

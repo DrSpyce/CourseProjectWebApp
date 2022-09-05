@@ -1,12 +1,14 @@
 ﻿@using CourseProjectWebApp.Models
 @model CourseProjectWebApp.Models.Collection
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
-	ViewData["Title"] = "Edit";
+	ViewData["Title"] = Localizer["Title"];
 }
 
-<h1 class="text-center">Edit</h1>
-<h4 class="text-center">Collection</h4>
+<h1 class="text-center">@Localizer["Edit"]</h1>
+<h4 class="text-center">@Localizer["Collection"]</h4>
 
 <form asp-action="edit" asp-controller="collection" asp-route-id="@Model.Id" method="post">
 	<div class="row d-flex justify-content-center">
@@ -15,17 +17,17 @@
 			<input type="hidden" asp-for="Id" />
 			<input type="hidden" asp-for="ApplicationUserId" />
 			<div class="form-group">
-				<label asp-for="Title" class="control-label"></label>
+				<label asp-for="Title" class="control-label">@Localizer["Collection title"]</label>
 				<input asp-for="Title" class="form-control" />
 				<span asp-validation-for="Title" class="text-danger"></span>
 			</div>
 			<div class="form-group">
-				<label asp-for="Topic" class="control-label"></label>
+				<label asp-for="Topic" class="control-label">@Localizer["Topic"]</label>
 				<select asp-for="Topic" class="form-control" asp-items="Html.GetEnumSelectList<Collection.Topics>()"></select>
 				<span asp-validation-for="Topic" class="text-danger"></span>
 			</div>
 			<div class="form-group">
-				<label asp-for="Description" class="control-label"></label>
+				<label asp-for="Description" class="control-label">@Localizer["Description"]</label>
 				<input id="markdownInput" />
 				<input asp-for="Description" class="form-control visually-hidden" id="descInput"/>
 				<span asp-validation-for="Description" class="text-danger"></span>
@@ -33,19 +35,19 @@
 		</div>
 	</div>
 	<div class="row mt-2">
-		<h4 class="text-center">Additional strings</h4>
+		<h4 class="text-center">@Localizer["Additional strings"]</h4>
 		@for(var i = 0; i < Model.AdditionalStrings.Count; i++)
 		{
 			<div class="col-md-4">
 				<input type="hidden" asp-for="@Model.AdditionalStrings[i].Id" />
 				<input type="hidden" asp-for="@Model.AdditionalStrings[i].TypeOfData" value="@Model.AdditionalStrings[i].TypeOfData" />
 				<div class="form-group">
-					<label asp-for="@Model.AdditionalStrings[i].Name" class="control-label"></label>
+					<label asp-for="@Model.AdditionalStrings[i].Name" class="control-label">@Localizer["Addtitional strings name"]</label>
 					<input asp-for="@Model.AdditionalStrings[i].Name" class="form-control" />
 					<span asp-validation-for="@Model.AdditionalStrings[i].Name" class="text-danger"></span>
 				</div>
 				<div class="form-group">
-					<label asp-for="@Model.AdditionalStrings[i].Display" class="control-label"></label>
+					<label asp-for="@Model.AdditionalStrings[i].Display" class="control-label">@Localizer["Display"]?</label>
 					<input asp-for="@Model.AdditionalStrings[i].Display" type="checkbox" class="form-check-input">
 					<span asp-validation-for="@Model.AdditionalStrings[i].Display" class="text-danger"></span>
 				</div>
@@ -54,7 +56,7 @@
 		}
 	</div>
 	<div class="form-group d-flex justify-content-center mt-3">
-		<input type="submit" value="Save" class="btn btn-primary px-4" />
+		<input type="submit" value="@Localizer["Save"]" class="btn btn-primary px-4" />
 	</div>
 </form>
 
@@ -64,7 +66,10 @@
 	}
 	 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
     <script>
-        var simplemde = new SimpleMDE({ element: document.getElementById("markdownInput") });
+        var simplemde = new SimpleMDE({ 
+			element: document.getElementById("markdownInput"),
+			hideIcons: ["guide", "image", "side-by-side", "fullscreen"]
+		});
         simplemde.codemirror.on('change', function () {
             $('#descInput').val(simplemde.value());
         });

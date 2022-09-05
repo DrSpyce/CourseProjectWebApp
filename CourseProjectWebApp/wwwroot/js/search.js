@@ -52,13 +52,13 @@ function clearAndFill(msg) {
 }
 
 function itemAddToList(li, msg) {
-    li.find('.dropdown-item').text('Item: ' + msg.title);
+    li.find('.dropdown-item').text(itemLoc + msg.title);
     li.find('.dropdown-item').attr('href', '/Collection/' + msg.collectionId + '/Item/' + msg.id);
     $('.dropdown-menu').append(li);
 }
 
 function collectionAddToList(li, msg) {
-    li.find('.dropdown-item').text('Collection: ' + msg.title);
+    li.find('.dropdown-item').text(collectionLoc + msg.title);
     li.find('.dropdown-item').attr('href', '/Collection/' + msg.id);
     $('.dropdown-menu').append(li);
 }

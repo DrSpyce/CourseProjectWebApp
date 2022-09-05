@@ -2,11 +2,13 @@
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @model CourseProjectWebApp.Models.Item
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Localizer["Title"];
 }
 
 <div>
@@ -26,7 +28,7 @@
 
         }
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Tags)
+            @Localizer["Tags"]:
         </dt>
         <dd class="col-sm-10">
             @foreach (var tag in Model.Tags)
@@ -35,7 +37,7 @@
             }
         </dd>
         <dt class="col-sm-2">
-            Likes:
+            @Localizer["Likes"]:
         </dt>
         <dd class="col-sm-10">
             <span id="likesCount">@Model.ItemUserLikes.Count()</span>
@@ -48,12 +50,12 @@
         <button id="likeButton" class="btn-primary btn visually-hidden">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
-            </svg> Like
+            </svg> @Localizer["Like"]
         </button>
         <button id="dislikeButton" class="btn-primary btn visually-hidden">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heartbreak" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M8.867 14.41c13.308-9.322 4.79-16.563.064-13.824L7 3l1.5 4-2 3L8 15a38.094 38.094 0 0 0 .867-.59Zm-.303-1.01c6.164-4.4 6.91-7.982 6.22-9.921C14.031 1.37 11.447.42 9.587 1.368L8.136 3.18l1.3 3.468a1 1 0 0 1-.104.906l-1.739 2.608.971 3.237Zm-1.25 1.137a36.027 36.027 0 0 1-1.522-1.116C-5.077 4.97 1.842-1.472 6.454.293c.314.12.618.279.904.477L5.5 3 7 7l-1.5 3 1.815 4.537Zm-2.3-3.06C.895 7.797.597 4.875 1.308 3.248c.756-1.73 2.768-2.577 4.456-2.127L4.732 2.36a1 1 0 0 0-.168.991L5.91 6.943l-1.305 2.61a1 1 0 0 0-.034.818l.442 1.106Z" />
-            </svg> Dislike
+            </svg> @Localizer["Dislike"]
         </button>
     }
 </div>
@@ -85,10 +87,10 @@
                             <p class="commentText">@comment.Text</p>
                             <div class="d-flex justify-content-between">
                                 <div class="d-flex flex-row align-items-center">
-                                    <p class="small mb-0 ms-2 commentUserName">User: @comment.ApplicationUser.UserName</p>
+                                    <p class="small mb-0 ms-2 commentUserName">@Localizer["User"]: @comment.ApplicationUser.UserName</p>
                                 </div>
                                 <div class="d-flex flex-row align-items-center">
-                                    <p class="small text-muted mb-0 commentDate">Date: @comment.Created</p>
+                                    <p class="small text-muted mb-0 commentDate">@Localizer["Date"]: @comment.Created</p>
                                 </div>
                             </div>
                         </div>
@@ -100,7 +102,7 @@
                 <div>
                     <textarea class="form-control" id="commentText"></textarea>
                 </div>
-                <input type="submit" value="Add Comment" class="btn btn-primary mt-2 " id="submit" />
+                <input type="submit" value="@Localizer["Add Comment"]" class="btn btn-primary mt-2" id="submit" />
             </div>
         </div>
     </div>
@@ -116,7 +118,10 @@
         const urlIsLiked = '@Url.Action("IsLiked","ajax")';
         const urlSetLike = '@Url.Action("SetLike","ajax")';
         const urlUnsetLike = '@Url.Action("UnsetLike","ajax")';
-        const urlCreateComment = '@Url.Action("CreateComment", "Ajax")'
+        const urlCreateComment = '@Url.Action("CreateComment", "Ajax")';
+        const commentEmpty = '@Localizer["Comment empty"]';
+        const userLoc = '@Localizer["User"]' + ': ';
+        const dateLoc = '@Localizer["Date"]' + ': ';
     </script>
     <script src="~/js/likes.js"></script>
     <script src="~/js/signalR.js"></script>

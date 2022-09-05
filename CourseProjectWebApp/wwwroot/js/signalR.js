@@ -29,8 +29,8 @@
 function fillTemplate(commentText, userName, date) {
     var clone = $(".cloneItem").first().clone();
     clone.find('.commentText').text(commentText);
-    clone.find('.commentUserName').text("User: " + userName);
-    clone.find('.commentDate').text("Date: " + date);
+    clone.find('.commentUserName').text(userLoc + userName);
+    clone.find('.commentDate').text(dateLoc + date);
     clone.removeClass('visually-hidden');
     $('#commentList').append(clone);
 }

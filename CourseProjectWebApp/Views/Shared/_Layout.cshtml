@@ -1,4 +1,6 @@
 ﻿@using static CourseProjectWebApp.Authorization.ProjectConstans
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,18 +28,18 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-body" asp-area="" asp-controller="Collection" asp-action="Index">Collections</a>
+                            <a class="nav-link text-body" asp-area="" asp-controller="Collection" asp-action="Index">@Localizer["Collections"]</a>
                         </li>
                         @if(User.Identity!.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-body" asp-area="" asp-controller="Collection" asp-action="Mine">User Collections</a>
+                                <a class="nav-link text-body" asp-area="" asp-controller="Collection" asp-action="Mine">@Localizer["User Collections"]</a>
                             </li>
                         }
                         @if (User.IsInRole(Constants.AdministratorRole))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-body" asp-area="" asp-controller="Admin" asp-action="index">Admin panel</a>
+                                <a class="nav-link text-body" asp-area="" asp-controller="Admin" asp-action="index">@Localizer["Admin panel"]</a>
                             </li>
                         }
                     </ul>
@@ -60,7 +62,15 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2022 - CourseProjectWebApp
+            <div class="row justify-content-between">
+                <div class="col-auto">
+                    &copy; 2022 - CourseProjectWebApp
+                </div>
+                <div class="col-auto">
+                    @await Html.PartialAsync("_SelectLanguagePartial")
+                </div>
+            </div>
+            
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -71,6 +81,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/js/darkmode.min.js"></script>
     <script src="~/js/site.js"></script>
     <script src="~/js/search.js"></script>
+    <script>
+        const collectionLoc = '@Localizer["Collection"]' + ': ';
+        const itemLoc = '@Localizer["Item"]' + ': ';
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

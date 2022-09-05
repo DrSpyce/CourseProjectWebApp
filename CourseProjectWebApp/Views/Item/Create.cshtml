@@ -1,26 +1,28 @@
 ﻿@model CourseProjectWebApp.Models.ViewModels.ItemTagsViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @using CourseProjectWebApp.Models
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = Localizer["Title"];
 }
 
-<h1>Create</h1>
+<h1>@Localizer["Create"]</h1>
 
 
-<h4>Item</h4>
+<h4>@Localizer["Item"]</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="create" asp-route-id="@ViewBag.Collection.Id">
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Item.Title" class="control-label"></label>
+                <label asp-for="Item.Title" class="control-label">@Localizer["Item title"]</label>
                 <input asp-for="Item.Title" class="form-control" />
                 <span asp-validation-for="Item.Title" class="text-danger"></span>
             </div>
             <div class="form-group" id="tagsForm">
-                <label for="tagName">Add tags</label>
+                <label for="tagName">@Localizer["Add tags"]</label>
                 <input class="form-control" id="tagName" />
                 @if (Model != null)
                 {
@@ -68,7 +70,7 @@
                 </div>
             }
             <div class="form-group mt-1">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="@Localizer["Create"]" class="btn btn-primary" />
             </div>
         </form>
     </div>

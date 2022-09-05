@@ -5,6 +5,7 @@ using System.Diagnostics;
 using CourseProjectWebApp.Interfaces;
 using static CourseProjectWebApp.Interfaces.IAjaxService;
 using System.Text.Json;
+using Microsoft.AspNetCore.Localization;
 
 namespace CourseProjectWebApp.Controllers
 {
@@ -65,10 +66,19 @@ namespace CourseProjectWebApp.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+        public IActionResult SetLanguage(string culture, string returnUrl)
+        {
+            Response.Cookies.Append(
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddMonths(1) }
+            );
+            return LocalRedirect(returnUrl);
+        }
+
         public IActionResult Search(string search)
         {
             var result = _ajaxService.SearchItem(search, 30);
-            //var res = JsonSerializer.Deserialize<List<SearchResultViewModel>>(result);
             return View((List<SearchResultViewModel>)result.Value);
         }
     }
