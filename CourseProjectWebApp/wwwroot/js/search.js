@@ -21,14 +21,16 @@
     }
 });
 
-$('#itemSearch').focusout(function () {
+/*$('#itemSearch').focusout(function () {
     $('#itemSearch').val('');
     $('.dropdown-menu').hide();
-});
+});*/
 
 $('#itemSearch').keypress(function (e) {
     if (e.which == 13) {
-        window.location.href = "home/search?search="+$('#itemSearch').val();
+        if ($('#itemSearch').val() != '') {
+            window.location.href = "home/search?search=" + $('#itemSearch').val();
+        }
     }
 });
 

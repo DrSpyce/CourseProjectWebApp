@@ -7,10 +7,10 @@ namespace CourseProjectWebApp.Models
     {
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "NameRequired")]
         public string? Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "TypeOfDataRequired")]
         public TypesOfData? TypeOfData { get; set; }
 
         public bool Display { get; set; } = true;

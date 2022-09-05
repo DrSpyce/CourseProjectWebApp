@@ -184,7 +184,7 @@ namespace CourseProjectWebApp.Controllers
                     Users.Add(user);
                     LogOut = true;
                 }
-                if (user != null)
+                else if (user != null)
                 {
                     Users.Insert(0, user);
                 } 

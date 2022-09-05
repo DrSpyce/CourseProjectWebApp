@@ -29,7 +29,7 @@
                 }
                 @if (result.TypeOfResult == SearchResultViewModel.TypeOfResults.Collection)
                 {
-                    <a class="list-group-item list-group-item-actio" asp-action="details" asp-controller="collection" asp-route-id="@result.CollectionId">@Localizer["Collection"]: @result.Title</a>
+                    <a class="list-group-item list-group-item-actio" asp-action="details" asp-controller="collection" asp-route-id="@result.Id">@Localizer["Collection"]: @result.Title</a>
                 }
             }
         </div>

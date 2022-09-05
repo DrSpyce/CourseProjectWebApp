@@ -10,14 +10,14 @@ namespace CourseProjectWebApp.Models
     {
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "TitleRequired")]
         [StringLength(50)]
         public string Title { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "DescriptionRequired")]
         public string Description { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "TopicRequired")]
         public Topics Topic { get; set; }
         
         [Url]

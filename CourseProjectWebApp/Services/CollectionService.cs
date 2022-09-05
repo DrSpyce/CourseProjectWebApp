@@ -75,6 +75,10 @@ namespace CourseProjectWebApp.Services
         {
             var collection = _context.Collection.AsNoTracking().FirstOrDefault(c => c.Id == id);
             coll.ApplicationUserId = collection!.ApplicationUserId;
+            if (!string.IsNullOrEmpty(collection.ImageUrl))
+            {
+                coll.ImageUrl = collection.ImageUrl;
+            }
             _context.Update(coll);
             await _context.SaveChangesAsync();
         } 

@@ -11,7 +11,8 @@ namespace CourseProjectWebApp.Models
         [Key]
         public int Id { get; set; }
 
-        [StringLength(50)]
+        [StringLength(50, ErrorMessage = "MaxLength")]
+        [Required(ErrorMessage = "NameRequired")]
         public string Name { get; set; }
 
         public List<Item> Items { get; set; } = new();
